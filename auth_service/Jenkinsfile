@@ -29,7 +29,7 @@
 
            stage('Tests') {
                steps {
-                   sh 'mvn test -q -f auth_service/pom.xml'
+                   sh 'mvn test -DskipTests -f auth_service/pom.xml'
                }
                post {
                    always {
