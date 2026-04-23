@@ -1,0 +1,71 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven 3.9'
+        jdk 'JDK 21'
+    }
+
+    environment {
+        SERVICE_NAME = 'auth-service'
+        SONAR_TOKEN  = credentials('sonar_recolte')
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+                echo "Branch: ${env.BRANCH_NAME}"
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir('auth-service') {
+                    sh 'mvn clean compile -q'
+                }
+            }
+        }
+
+        stage('Tests') {
+            steps {
+                dir('auth-service') {
+                    sh 'mvn test -q'
+                }
+            }
+            post {
+                always {
+                    junit 'auth-service/target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('SonarQube') {
+            steps {
+                dir('auth-service') {
+                    withSonarQubeEnv('SonarQube') {
+                        sh "mvn sonar:sonar -Dsonar.token=${SONAR_TOKEN}"
+                    }
+                }
+            }
+        }
+
+        stage('Package') {
+            steps {
+                dir('auth-service') {
+                    sh 'mvn package -DskipTests -q'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo " votre build a réussi !"
+        }
+        failure {
+            echo " votre  build a  échoué !"
+        }
+    }
+}
