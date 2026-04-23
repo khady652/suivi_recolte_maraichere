@@ -32,9 +32,9 @@
                    sh 'mvn test -DskipTests -f auth_service/pom.xml'
                }
                post {
-                   always {
-                       junit 'auth_service/target/surefire-reports/*.xml'
-                   }
+                   /* always {
+                       junit 'auth_service/target/surefire-reports *//*.xml'
+                   } */
                }
            }
 
