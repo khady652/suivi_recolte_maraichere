@@ -31,11 +31,11 @@
                steps {
                    sh 'mvn test -DskipTests -f auth_service/pom.xml'
                }
-               post {
-                   /* always {
+               /*post {
+                    always {
                        junit 'auth_service/target/surefire-reports *//*.xml'
-                   } */
-               }
+                   }
+               }*/
            }
 
            stage('SonarQube') {
