@@ -29,13 +29,14 @@
 
            stage('Tests') {
                steps {
-                   sh 'mvn test -DskipTests -f auth_service/pom.xml'
+                   sh 'mvn test -f auth_service/pom.xml -Dspring.profiles.active=jenkins'
                }
-               /*post {
-                    always {
-                       junit 'auth_service/target/surefire-reports *//*.xml'
+               post {
+                   always {
+                       junit allowEmptyResults: true,
+                             testResults: 'auth_service/target/surefire-reports/*.xml'
                    }
-               }*/
+               }
            }
 
            stage('SonarQube') {
