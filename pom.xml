@@ -19,6 +19,8 @@
 
     <modules>
         <module>auth_service</module>
+        <module>user_service</module>
+        <module>api-gateway</module>
     </modules>
 
     <properties>
