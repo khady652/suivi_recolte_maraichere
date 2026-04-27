@@ -1,0 +1,63 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven 3.9'
+        jdk 'JDK 21'
+    }
+
+    environment {
+        SERVICE_NAME = 'user_service'
+        SONAR_TOKEN = credentials('sonar_recolte')
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean compile -q -f user_service/pom.xml'
+            }
+        }
+
+        stage('Tests') {
+            steps {
+                sh 'mvn test -DskipTests -f user_service/pom.xml'
+            }
+        }
+
+        stage('SonarQube') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh """
+                        mvn sonar:sonar \
+                        -f user_service/pom.xml \
+                        -Dsonar.projectKey=user-service \
+                        -Dsonar.projectName=user-service \
+                        -Dsonar.token=${SONAR_TOKEN}
+                    """
+                }
+            }
+        }
+
+        stage('Package') {
+            steps {
+                sh 'mvn package -DskipTests -q -f user_service/pom.xml'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ user-service build réussi !"
+        }
+        failure {
+            echo "❌ user-service build échoué !"
+        }
+    }
+}
