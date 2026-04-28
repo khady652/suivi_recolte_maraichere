@@ -44,6 +44,9 @@ public class DirecteurService {
             throw new UserException("Cet email est déjà utilisé");
 
         DirecteurDRDR directeur = new DirecteurDRDR();
+        if (request.getUserId() != null) {
+            directeur.setIdUtilisateur(request.getUserId());
+        }
         directeur.setNom(request.getNom());
         directeur.setPrenom(request.getPrenom());
         directeur.setAdresse(request.getAdresse());

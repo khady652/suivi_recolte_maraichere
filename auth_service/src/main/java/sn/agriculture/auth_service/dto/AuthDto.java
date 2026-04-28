@@ -49,6 +49,12 @@ public class AuthDto {
             private String password;
 
             private String role;
+            private String nom;
+            private String prenom;
+            private String adresse;
+            private Integer anneeExperience;
+            private String niveauInstruction;
+            private Integer idCooperative;
         }
 
         // ── RÉPONSE APRÈS LOGIN RÉUSSI ────────────────────────

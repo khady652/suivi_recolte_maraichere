@@ -35,6 +35,9 @@ public class EnqueteurService {
             throw new UserException("Cet email est déjà utilisé");
 
         EnqueteurMarche enqueteur = new EnqueteurMarche();
+        if (request.getUserId() != null) {
+            enqueteur.setIdUtilisateur(request.getUserId());
+        }
         enqueteur.setNom(request.getNom());
         enqueteur.setPrenom(request.getPrenom());
         enqueteur.setAdresse(request.getAdresse());

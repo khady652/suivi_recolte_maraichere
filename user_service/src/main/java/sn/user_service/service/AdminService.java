@@ -35,6 +35,9 @@ import java.util.stream.Collectors;
                 throw new UserException("Cet email est déjà utilisé");
 
             Administrateur admin = new Administrateur();
+            if (request.getUserId() != null) {
+                admin.setIdUtilisateur(request.getUserId());
+            }
             admin.setNom(request.getNom());
             admin.setPrenom(request.getPrenom());
             admin.setAdresse(request.getAdresse());

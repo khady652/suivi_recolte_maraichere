@@ -37,6 +37,9 @@ import java.util.stream.Collectors;
                 throw new UserException("Cet email est déjà utilisé");
 
             DecideurARM decideur = new DecideurARM();
+            if (request.getUserId() != null) {
+                decideur.setIdUtilisateur(request.getUserId());
+            }
             decideur.setNom(request.getNom());
             decideur.setPrenom(request.getPrenom());
             decideur.setAdresse(request.getAdresse());

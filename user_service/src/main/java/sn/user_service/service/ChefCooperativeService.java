@@ -47,6 +47,9 @@ import java.util.stream.Collectors;
                             new UserException("Coopérative introuvable"));
 
             ChefCooperatif chef = new ChefCooperatif();
+            if (request.getUserId() != null) {
+                chef.setIdUtilisateur(request.getUserId());
+            }
             chef.setNom(request.getNom());
             chef.setPrenom(request.getPrenom());
             chef.setAdresse(request.getAdresse());

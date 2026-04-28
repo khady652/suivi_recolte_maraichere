@@ -41,6 +41,11 @@ import java.util.stream.Collectors;
 
             // Créer l'agriculteur
             Agriculteur agriculteur = new Agriculteur();
+            
+            if (request.getUserId() != null) {
+                agriculteur.setIdUtilisateur(request.getUserId());
+            }
+
             agriculteur.setNom(request.getNom());
             agriculteur.setPrenom(request.getPrenom());
             agriculteur.setAdresse(request.getAdresse());
@@ -68,9 +73,8 @@ import java.util.stream.Collectors;
                     "Agriculteur " + request.getNom() + " créé avec succès",
                     true);
         }
-
         // ── LIRE TOUS ─────────────────────────────────────────
-        @Transactional
+        @Transactional(readOnly = true)
         public List<AgriculteurReponse> getAll() {
             return agriculteurRepository.findAll()
                     .stream()
@@ -79,7 +83,7 @@ import java.util.stream.Collectors;
         }
 
         // ── LIRE UN
-        @Transactional
+        @Transactional(readOnly = true)
         public AgriculteurReponse getById(Integer id) {
             Agriculteur agriculteur = agriculteurRepository
                     .findById(id)

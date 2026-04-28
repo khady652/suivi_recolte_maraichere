@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sn.agriculture.auth_service.UserServiceClient;
 import sn.agriculture.auth_service.dto.AuthDto.*;
 import sn.agriculture.auth_service.entity.User;
 import sn.agriculture.auth_service.exception.AuthException;
@@ -19,6 +20,7 @@ import sn.agriculture.auth_service.security.JwtService;
         private final UserRepository userRepository;
         private final PasswordEncoder passwordEncoder;
         private final JwtService jwtService;
+        private final UserServiceClient userServiceClient;
 
         // ── LOGIN PAR EMAIL ───────────────────────────────────
         @Transactional
@@ -68,34 +70,33 @@ import sn.agriculture.auth_service.security.JwtService;
         @Transactional
         public MessageResponse register(RegisterRequest request) {
 
-            // 1. Vérifier que l'email n'existe pas déjà
             if (request.getEmail() != null &&
-                    userRepository.existsByEmail(request.getEmail())) {
+                    userRepository.existsByEmail(request.getEmail()))
                 throw new AuthException("Cet email est déjà utilisé");
-            }
 
-            // 2. Vérifier que le téléphone n'existe pas déjà
             if (request.getTelephone() != null &&
-                    userRepository.existsByTelephone(request.getTelephone())) {
+                    userRepository.existsByTelephone(request.getTelephone()))
                 throw new AuthException("Ce numéro est déjà utilisé");
-            }
 
-            // 3. Créer l'utilisateur
             User user = new User();
             user.setEmail(request.getEmail());
             user.setTelephone(request.getTelephone());
             user.setPassword(passwordEncoder.encode(request.getPassword()));
-            user.setRole(request.getRole() != null ? request.getRole() : "AGRICULTEUR");
+            user.setRole(request.getRole() != null ?
+                    request.getRole() : "AGRICULTEUR");
             user.setActif(false);
-
             userRepository.save(user);
+
+            // ← Appeler user-service
+            userServiceClient.creerProfil(user.getId(), request);
+
             log.info("Nouveau compte créé : {}", user.getEmail());
 
             return new MessageResponse(
                     "Compte créé avec succès. En attente d'activation.",
-                    true
-            );
+                    true);
         }
+
 
         // ── REFRESH TOKEN ─────────────────────────────────────
         public AuthResponse refreshToken(RefreshTokenRequest request) {
