@@ -33,6 +33,15 @@ public class SecurityConfig {
                                 "/api/users/agriculteurs",
                                 "/api/users/agriculteurs/**"
                         ).permitAll()
+
+                        // Swagger
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/v3/api-docs.yaml",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/webjars/**"
+                        ).permitAll()
                         .requestMatchers("/actuator/health").permitAll()
 
                         // ── ADMINISTRATEUR ────────────────────────────

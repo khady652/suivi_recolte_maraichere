@@ -32,7 +32,16 @@ import java.util.List;
                 "/api/auth/health",
                 "/api/users/agriculteurs",
                 "/api/users/cooperatives",
-                "/actuator/health"
+                "/actuator/health",
+                "/api/auth/internal",
+
+                // Swagger
+                "/swagger-ui.html",
+                "/swagger-ui",
+                "/v3/api-docs",
+                "/auth-service/v3/api-docs",
+                "/users-service/v3/api-docs",
+                "/webjars"
         );
 
         @Override

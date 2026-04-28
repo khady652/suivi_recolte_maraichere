@@ -44,9 +44,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
                             .requestMatchers("/api/auth/refresh").permitAll()
                             .requestMatchers("/api/auth/health").permitAll()
 
+                            //  Swagger
+                                    .requestMatchers(
+                                            "/v3/api-docs/**",
+                                            "/v3/api-docs.yaml",
+                                            "/swagger-ui/**",
+                                            "/swagger-ui.html",
+                                            "/webjars/**"
+                                    ).permitAll()
                             // Routes admin seulement
                             .requestMatchers("/api/auth/users/**")
                             .hasRole("ADMINISTRATEUR")
+                            .requestMatchers("/api/auth/internal/**").permitAll()
 
                             // Toutes les autres routes → token requis
                             .anyRequest().authenticated()

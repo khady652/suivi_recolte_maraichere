@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import sn.user_service.dto.Requests.AgriculteurCooperatifRequest;
 import sn.user_service.dto.Requests.ChefCooperatifRequest;
+import sn.user_service.dto.Responses.AgriculteurReponse;
 import sn.user_service.dto.Responses.ChefCooperatifResponse;
 import sn.user_service.dto.Responses.MessageResponse;
 import sn.user_service.service.ChefCooperativeService;
@@ -62,12 +64,25 @@ import java.util.List;
                     chefCooperatifService.delete(id));
         }
 
-        @GetMapping("/mon-profil")
-        public ResponseEntity<ChefCooperatifResponse> getMonProfil(
+        // POST /api/users/chefs-cooperatifs/agriculteurs
+        @PostMapping("/agriculteurs")
+        public ResponseEntity<MessageResponse> inscrireAgriculteur(
+                @Valid @RequestBody AgriculteurCooperatifRequest request,
                 Authentication authentication) {
-            Integer userId = (Integer) authentication.getPrincipal();
+            Integer chefUserId = (Integer) authentication.getPrincipal();
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(chefCooperatifService.inscrireAgriculteur(
+                            chefUserId, request));
+        }
+
+        // GET /api/users/chefs-cooperatifs/mes-agriculteurs
+        @GetMapping("/mes-agriculteurs")
+        public ResponseEntity<List<AgriculteurReponse>> getMesAgriculteurs(
+                Authentication authentication) {
+            Integer chefUserId = (Integer) authentication.getPrincipal();
             return ResponseEntity.ok(
-                    chefCooperatifService.getMonProfil(userId));
+                    chefCooperatifService.getMesAgriculteurs(chefUserId));
         }
 
     }

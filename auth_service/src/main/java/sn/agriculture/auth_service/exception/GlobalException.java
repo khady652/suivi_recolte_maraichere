@@ -19,7 +19,7 @@ import java.util.Map;
         public ResponseEntity<MessageResponse> handleAuthException(AuthException e) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body(new MessageResponse(e.getMessage(), false));
+                    .body(new MessageResponse(e.getMessage(), false,null));
         }
 
         // Erreur de validation → 400
@@ -40,7 +40,7 @@ import java.util.Map;
         public ResponseEntity<MessageResponse> handleGeneral(Exception e) {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new MessageResponse("Une erreur interne est survenue", false));
+                    .body(new MessageResponse("Une erreur interne est survenue", false,null));
         }
     }
 

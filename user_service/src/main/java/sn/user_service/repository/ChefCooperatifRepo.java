@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface ChefCooperatifRepo extends JpaRepository<ChefCooperatif, Integer> {
     Optional<ChefCooperatif> findByCooperativeIdCooperation(
             Integer idCooperation);
+    Optional<ChefCooperatif> findByIdUtilisateur(Integer idUtilisateur);
 }

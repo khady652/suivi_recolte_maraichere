@@ -1,8 +1,5 @@
 package sn.agriculture.auth_service.controller;
 
-
-
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sn.agriculture.auth_service.dto.AuthDto.*;
+import sn.agriculture.auth_service.dto.CreateAccountRequest;
 import sn.agriculture.auth_service.service.AuthService;
 
     @RestController
@@ -63,8 +61,15 @@ import sn.agriculture.auth_service.service.AuthService;
         @GetMapping("/health")
         public ResponseEntity<MessageResponse> health() {
             return ResponseEntity.ok(
-                    new MessageResponse("auth-service opérationnel", true)
+                    new MessageResponse("auth-service opérationnel", true,null)
             );
+        }
+        //ajout d  un agricullteur
+        @PostMapping("/internal/create-account")
+        public ResponseEntity<MessageResponse> createAccount(
+                @RequestBody CreateAccountRequest request) {
+            return ResponseEntity.ok(
+                    authService.createAccount(request));
         }
     }
 

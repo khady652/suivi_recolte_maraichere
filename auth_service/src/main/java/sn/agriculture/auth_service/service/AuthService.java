@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sn.agriculture.auth_service.UserServiceClient;
 import sn.agriculture.auth_service.dto.AuthDto.*;
+import sn.agriculture.auth_service.dto.CreateAccountRequest;
 import sn.agriculture.auth_service.entity.User;
 import sn.agriculture.auth_service.exception.AuthException;
 import sn.agriculture.auth_service.repository.UserRepository;
@@ -82,9 +83,8 @@ import sn.agriculture.auth_service.security.JwtService;
             user.setEmail(request.getEmail());
             user.setTelephone(request.getTelephone());
             user.setPassword(passwordEncoder.encode(request.getPassword()));
-            user.setRole(request.getRole() != null ?
-                    request.getRole() : "AGRICULTEUR");
-            user.setActif(false);
+            user.setRole("AGRICULTEUR");
+            user.setActif(true);
             userRepository.save(user);
 
             // ← Appeler user-service
@@ -93,8 +93,8 @@ import sn.agriculture.auth_service.security.JwtService;
             log.info("Nouveau compte créé : {}", user.getEmail());
 
             return new MessageResponse(
-                    "Compte créé avec succès. En attente d'activation.",
-                    true);
+                    "inscription reussi. Vous pouvez vous connectez ",
+                    true,null);
         }
 
 
@@ -133,6 +133,24 @@ import sn.agriculture.auth_service.security.JwtService;
             response.setUserId(user.getId());
 
             return response;
+        }
+        public MessageResponse createAccount(CreateAccountRequest request) {
+
+            if (userRepository.existsByEmail(request.getEmail())) {
+                throw new RuntimeException("Email déjà utilisé");
+            }
+
+            User user = new User();
+            user.setEmail(request.getEmail());
+            user.setTelephone(request.getTelephone());
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setRole(request.getRole());
+            User savedUser = userRepository.save(user);
+
+            log.info("Compte créé pour : {}", request.getEmail());
+
+            // ✅ Retourner le userId
+            return new MessageResponse("Compte créé avec succès", true, savedUser.getId());
         }
     }
 

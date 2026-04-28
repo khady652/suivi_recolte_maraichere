@@ -7,12 +7,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sn.user_service.Client.AuthServiceClient;
+import sn.user_service.dto.Requests.AgriculteurCooperatifRequest;
 import sn.user_service.dto.Requests.ChefCooperatifRequest;
+import sn.user_service.dto.Responses.AgriculteurReponse;
 import sn.user_service.dto.Responses.ChefCooperatifResponse;
 import sn.user_service.dto.Responses.MessageResponse;
+import sn.user_service.entity.Agriculteur;
 import sn.user_service.entity.ChefCooperatif;
 import sn.user_service.entity.Cooperative;
 import sn.user_service.exception.UserException;
+import sn.user_service.repository.AgriculteurRepo;
 import sn.user_service.repository.ChefCooperatifRepo;
 import sn.user_service.repository.CooperativeRepository;
 import sn.user_service.repository.UtilisateurRepository;
@@ -28,7 +33,8 @@ import java.util.stream.Collectors;
         private final ChefCooperatifRepo chefCooperatifRepository;
         private final CooperativeRepository cooperativeRepository;
         private final UtilisateurRepository utilisateurRepository;
-
+        private final AuthServiceClient authServiceClient;
+        private final AgriculteurRepo agriculteurRepo;
         // ── CRÉER ─────────────────────────────────────────────
         @Transactional
         public MessageResponse creer(ChefCooperatifRequest request) {
@@ -148,6 +154,89 @@ import java.util.stream.Collectors;
                     .orElseThrow(() ->
                             new UserException("Profil introuvable"));
             return toResponse(chef);
+        }
+
+        @Transactional
+        public MessageResponse inscrireAgriculteur(
+                Integer chefUserId,
+                AgriculteurCooperatifRequest request) {
+
+            // 1. Trouver le chef par son userId
+            ChefCooperatif chef = chefCooperatifRepository
+                    .findByIdUtilisateur(chefUserId)
+                    .orElseThrow(() ->
+                            new UserException("Chef coopératif introuvable"));
+
+            // 2. Vérifier email non utilisé
+            if (request.getEmail() != null &&
+                    utilisateurRepository.existsByEmail(request.getEmail())) {
+                throw new UserException("Cet email est déjà utilisé");
+            }
+
+            // 3. Créer le compte dans auth-service
+            Integer userId = authServiceClient.createAccount(
+                    request.getEmail(),
+                    request.getTelephone(),
+                    "AGRICULTEUR"
+            );
+
+            // 4. Créer le profil agriculteur
+            Agriculteur agriculteur = new Agriculteur();
+            agriculteur.setIdUtilisateur(userId);
+            agriculteur.setNom(request.getNom());
+            agriculteur.setPrenom(request.getPrenom());
+            agriculteur.setEmail(request.getEmail());
+            agriculteur.setTelephone(request.getTelephone());
+            agriculteur.setAdresse(request.getAdresse());
+            agriculteur.setAnneeExperience(request.getAnneeExperience());
+            agriculteur.setNiveauInstruction(request.getNiveauInstruction());
+
+            // 5. Rattacher automatiquement à la coopérative du chef ✅
+            agriculteur.setCooperative(chef.getCooperative());
+            agriculteur.setRole("AGRICULTEUR");
+            agriculteur.setActif(true);
+
+            agriculteurRepo.save(agriculteur);
+
+            log.info("Agriculteur {} inscrit par chef {}",
+                    request.getNom(), chefUserId);
+
+            return new MessageResponse(
+                    "Agriculteur " + request.getNom() +
+                            " inscrit avec succès", true);
+        }
+        private AgriculteurReponse toAgriculteurResponse(Agriculteur a) {
+            AgriculteurReponse response = new AgriculteurReponse();
+            response.setIdUtilisateur(a.getIdUtilisateur());
+            response.setNom(a.getNom());
+            response.setPrenom(a.getPrenom());
+            response.setAdresse(a.getAdresse());
+            response.setEmail(a.getEmail());
+            response.setTelephone(a.getTelephone());
+            response.setAnneeExperience(a.getAnneeExperience());
+            response.setNiveauInstruction(a.getNiveauInstruction());
+            response.setActif(a.getActif());
+            if (a.getCooperative() != null) {
+                response.setNomCooperative(
+                        a.getCooperative().getNomCooperative());
+            }
+            return response;
+        }
+        // Liste des agriculteurs de sa coopérative
+        public List<AgriculteurReponse> getMesAgriculteurs(
+                Integer chefUserId) {
+
+            ChefCooperatif chef = chefCooperatifRepository
+                    .findByIdUtilisateur(chefUserId)
+                    .orElseThrow(() ->
+                            new UserException("Chef coopératif introuvable"));
+
+            return agriculteurRepo
+
+                    .findByCooperativeIdCooperation(chef.getCooperative().getIdCooperation())
+                    .stream()
+                    .map(this::toAgriculteurResponse)
+                    .collect(Collectors.toList());
         }
     }
 

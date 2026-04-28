@@ -76,6 +76,7 @@ public class AuthDto {
         public static class MessageResponse {
             private String message;
             private Boolean success;
+            private Integer userId;
         }
 
         // ── REFRESH TOKEN ─────────────────────────────────────
@@ -86,5 +87,6 @@ public class AuthDto {
             @NotBlank(message = "Le refresh token est obligatoire")
             private String refreshToken;
         }
+
     }
 

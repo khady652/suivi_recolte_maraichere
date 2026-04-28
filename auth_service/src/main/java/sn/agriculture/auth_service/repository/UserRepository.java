@@ -1,6 +1,7 @@
 package sn.agriculture.auth_service.repository;
 
 
+import lombok.Data;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import sn.agriculture.auth_service.entity.User;
