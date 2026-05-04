@@ -52,10 +52,15 @@ import java.util.stream.Collectors;
                     .orElseThrow(() ->
                             new UserException("Coopérative introuvable"));
 
+            // ✅ Créer le compte dans auth-service
+            Integer userId = authServiceClient.createAccount(
+                    request.getEmail(),
+                    request.getTelephone(),
+                    "CHEF_COOPERATIF"
+            );
+
             ChefCooperatif chef = new ChefCooperatif();
-            if (request.getUserId() != null) {
-                chef.setIdUtilisateur(request.getUserId());
-            }
+            chef.setIdUtilisateur(userId); // ✅ userId depuis auth-service
             chef.setNom(request.getNom());
             chef.setPrenom(request.getPrenom());
             chef.setAdresse(request.getAdresse());
@@ -63,7 +68,7 @@ import java.util.stream.Collectors;
             chef.setTelephone(request.getTelephone());
             chef.setCooperative(cooperative);
             chef.setRole("CHEF_COOPERATIF");
-            chef.setActif(false);
+            chef.setActif(true); // ✅ true par défaut
 
             chefCooperatifRepository.save(chef);
             log.info("Chef coopératif créé : {}", request.getNom());

@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
     @AllArgsConstructor
     public class DirecteurRequest {
 
-        private Integer userId;
 
         @NotBlank(message = "Le nom est obligatoire")
         private String nom;
@@ -34,6 +33,7 @@ import lombok.NoArgsConstructor;
 
         @NotBlank(message = "La spécialité est obligatoire")
         private String specialite;
-        private Integer idService;
+        private Integer idServiceRegional;       // pour DR
+        private Integer idServiceDepartementale;
     }
 

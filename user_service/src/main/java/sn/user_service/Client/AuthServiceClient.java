@@ -46,4 +46,27 @@ public class AuthServiceClient {
             throw new RuntimeException("Échec création compte", e);
         }
     }
+    public void activerCompte(Integer userId) {
+        try {
+            restClient.patch()
+                    .uri("/api/auth/internal/activer/" + userId)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (Exception e) {
+            log.error("Erreur activation compte : {}", e.getMessage());
+            throw new RuntimeException("Échec activation compte", e);
+        }
+    }
+
+    public void desactiverCompte(Integer userId) {
+        try {
+            restClient.patch()
+                    .uri("/api/auth/internal/desactiver/" + userId)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (Exception e) {
+            log.error("Erreur désactivation compte : {}", e.getMessage());
+            throw new RuntimeException("Échec désactivation compte", e);
+        }
+    }
 }

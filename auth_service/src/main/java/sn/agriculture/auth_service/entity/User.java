@@ -23,7 +23,7 @@ public class User {
     @Column(nullable = false)
     private String password;
     private String role;
-    private Boolean actif = false;
+    private Boolean actif = true;
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

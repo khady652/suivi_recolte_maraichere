@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
     @AllArgsConstructor
     public class EnqueteurRequest {
 
-        private Integer userId;
 
         @NotBlank(message = "Le nom est obligatoire")
         private String nom;

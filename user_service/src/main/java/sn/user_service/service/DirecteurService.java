@@ -1,11 +1,11 @@
 package sn.user_service.service;
 
-
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sn.user_service.Client.AuthServiceClient;
+import sn.user_service.Client.GeoServiceClient;
 import sn.user_service.dto.Requests.DirecteurRequest;
 import sn.user_service.dto.Responses.DirecteurResponse;
 import sn.user_service.dto.Responses.MessageResponse;
@@ -17,6 +17,7 @@ import sn.user_service.repository.DirecteurSddrRepo;
 import sn.user_service.repository.UtilisateurRepository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,10 +28,8 @@ public class DirecteurService {
     private final DirecteurDrdrRepo directeurDRRepository;
     private final DirecteurSddrRepo directeurSDDRRepository;
     private final UtilisateurRepository utilisateurRepository;
-
-    // ══════════════════════════════════════════════════════
-    //  DIRECTEUR DR
-    // ══════════════════════════════════════════════════════
+    private final AuthServiceClient authServiceClient;
+    private final GeoServiceClient geoServiceClient; // ✅ Ajout
 
     // ── CRÉER DR ──────────────────────────────────────────
     @Transactional
@@ -43,10 +42,24 @@ public class DirecteurService {
                 utilisateurRepository.existsByEmail(request.getEmail()))
             throw new UserException("Cet email est déjà utilisé");
 
-        DirecteurDRDR directeur = new DirecteurDRDR();
-        if (request.getUserId() != null) {
-            directeur.setIdUtilisateur(request.getUserId());
+        // ✅ Vérifier que le service n'est pas déjà pris
+        if (request.getIdServiceRegional() != null &&
+                directeurDRRepository
+                        .existsByIdServiceRegional(
+                                request.getIdServiceRegional())) {
+            throw new UserException(
+                    "Ce service régional a déjà un directeur DR !");
         }
+
+        // Créer le compte dans auth-service
+        Integer userId = authServiceClient.createAccount(
+                request.getEmail(),
+                request.getTelephone(),
+                "DIRECTEUR_DR"
+        );
+
+        DirecteurDRDR directeur = new DirecteurDRDR();
+        directeur.setIdUtilisateur(userId);
         directeur.setNom(request.getNom());
         directeur.setPrenom(request.getPrenom());
         directeur.setAdresse(request.getAdresse());
@@ -54,7 +67,16 @@ public class DirecteurService {
         directeur.setTelephone(request.getTelephone());
         directeur.setSpecialite(request.getSpecialite());
         directeur.setRole("DIRECTEUR_DR");
-        directeur.setActif(false);
+        directeur.setActif(true);
+
+        // ✅ Affecter le service régional
+        if (request.getIdServiceRegional() != null) {
+            directeur.setIdServiceRegional(request.getIdServiceRegional());
+
+            // ✅ Appel geo-service
+            geoServiceClient.affecterDirecteurDR(
+                    request.getIdServiceRegional(), userId);
+        }
 
         directeurDRRepository.save(directeur);
         log.info("Directeur DR créé : {}", request.getNom());
@@ -101,6 +123,12 @@ public class DirecteurService {
             directeur.setTelephone(request.getTelephone());
         if (request.getSpecialite() != null)
             directeur.setSpecialite(request.getSpecialite());
+        if (request.getIdServiceRegional() != null) {
+            directeur.setIdServiceRegional(request.getIdServiceRegional());
+            geoServiceClient.affecterDirecteurDR(
+                    request.getIdServiceRegional(),
+                    directeur.getIdUtilisateur());
+        }
 
         directeurDRRepository.save(directeur);
         return new MessageResponse(
@@ -119,10 +147,6 @@ public class DirecteurService {
                 "Directeur DR supprimé avec succès", true);
     }
 
-    // ══════════════════════════════════════════════════════
-    //  DIRECTEUR SDDR
-    // ══════════════════════════════════════════════════════
-
     // ── CRÉER SDDR ────────────────────────────────────────
     @Transactional
     public MessageResponse creerSDDR(DirecteurRequest request) {
@@ -134,7 +158,24 @@ public class DirecteurService {
                 utilisateurRepository.existsByEmail(request.getEmail()))
             throw new UserException("Cet email est déjà utilisé");
 
+        // ✅ Vérifier que le service n'est pas déjà pris
+        if (request.getIdServiceDepartementale() != null &&
+                directeurSDDRRepository
+                        .existsByIdServiceDepartementale(
+                                request.getIdServiceDepartementale())) {
+            throw new UserException(
+                    "Ce service départemental a déjà un directeur SDDR !");
+        }
+
+        // Créer le compte dans auth-service
+        Integer userId = authServiceClient.createAccount(
+                request.getEmail(),
+                request.getTelephone(),
+                "DIRECTEUR_SDDR"
+        );
+
         DirecteurSDDR directeur = new DirecteurSDDR();
+        directeur.setIdUtilisateur(userId);
         directeur.setNom(request.getNom());
         directeur.setPrenom(request.getPrenom());
         directeur.setAdresse(request.getAdresse());
@@ -142,10 +183,17 @@ public class DirecteurService {
         directeur.setTelephone(request.getTelephone());
         directeur.setSpecialite(request.getSpecialite());
         directeur.setRole("DIRECTEUR_SDDR");
-        directeur.setActif(false);
+        directeur.setActif(true);
 
-        if (request.getIdService() != null)
-            directeur.setIdServiceSDDR(request.getIdService());
+        // ✅ Affecter le service départemental
+        if (request.getIdServiceDepartementale() != null) {
+            directeur.setIdServiceDepartementale(
+                    request.getIdServiceDepartementale());
+
+            // ✅ Appel geo-service
+            geoServiceClient.affecterDirecteurSDDR(
+                    request.getIdServiceDepartementale(), userId);
+        }
 
         directeurSDDRRepository.save(directeur);
         log.info("Directeur SDDR créé : {}", request.getNom());
@@ -192,8 +240,13 @@ public class DirecteurService {
             directeur.setTelephone(request.getTelephone());
         if (request.getSpecialite() != null)
             directeur.setSpecialite(request.getSpecialite());
-        if (request.getIdService() != null)
-            directeur.setIdServiceSDDR(request.getIdService());
+        if (request.getIdServiceDepartementale() != null) {
+            directeur.setIdServiceDepartementale(
+                    request.getIdServiceDepartementale());
+            geoServiceClient.affecterDirecteurSDDR(
+                    request.getIdServiceDepartementale(),
+                    directeur.getIdUtilisateur());
+        }
 
         directeurSDDRRepository.save(directeur);
         return new MessageResponse(
@@ -212,10 +265,7 @@ public class DirecteurService {
                 "Directeur SDDR supprimé avec succès", true);
     }
 
-    // ══════════════════════════════════════════════════════
-    //  MÉTHODES UTILITAIRES
-    // ══════════════════════════════════════════════════════
-
+    // ── MÉTHODES UTILITAIRES ──────────────────────────────
     private DirecteurResponse toDRResponse(DirecteurDRDR d) {
         DirecteurResponse response = new DirecteurResponse();
         response.setIdUtilisateur(d.getIdUtilisateur());
@@ -239,8 +289,22 @@ public class DirecteurService {
         response.setTelephone(d.getTelephone());
         response.setSpecialite(d.getSpecialite());
         response.setActif(d.getActif());
+
+        // ✅ Récupérer le nom du service depuis geo-service
+        if (d.getIdServiceDepartementale() != null) {
+            try {
+                String nomService = geoServiceClient
+                        .getNomServiceDepartementale(
+                                d.getIdServiceDepartementale());
+                response.setNomService(nomService);
+            } catch (Exception e) {
+                log.warn("Service départemental introuvable : {}",
+                        d.getIdServiceDepartementale());
+            }
+        }
         return response;
     }
+
     public DirecteurResponse getMonProfilDR(Integer userId) {
         DirecteurDRDR directeur = directeurDRRepository
                 .findById(userId)
@@ -255,5 +319,38 @@ public class DirecteurService {
                 .orElseThrow(() ->
                         new UserException("Profil introuvable"));
         return toSDDRResponse(directeur);
+    }
+    public Map<String, String> getSDDRInfo(Integer id) {
+        DirecteurSDDR directeur = directeurSDDRRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new UserException("Directeur introuvable"));
+        return Map.of(
+                "nom", directeur.getNom(),
+                "prenom", directeur.getPrenom()
+        );
+    }
+
+    /*public Map<String, String> getDRInfo(Integer id) {
+        DirecteurDRDR directeur = directeurDRRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new UserException("Directeur introuvable"));
+        return Map.of(
+                "nom", directeur.getNom(),
+                "prenom", directeur.getPrenom()
+        );
+    }*/
+    public Map<String, Object> getDRInfo(Integer id) {
+        DirecteurDRDR directeur = directeurDRRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new UserException("Directeur introuvable"));
+        return Map.of(
+                "nom", directeur.getNom(),
+                "prenom", directeur.getPrenom(),
+                "idServiceRegional", directeur.getIdServiceRegional() != null
+                        ? directeur.getIdServiceRegional() : ""
+        );
     }
 }

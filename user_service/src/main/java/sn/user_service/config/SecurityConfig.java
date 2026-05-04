@@ -43,7 +43,10 @@ public class SecurityConfig {
                                 "/webjars/**"
                         ).permitAll()
                         .requestMatchers("/actuator/health").permitAll()
-
+                        .requestMatchers("GET",
+                                "/api/users/directeurs/sddr/*/info",
+                                "/api/users/directeurs/dr/*/info"
+                        ).permitAll()
                         // ── ADMINISTRATEUR ────────────────────────────
                         .requestMatchers("POST",
                                 "/api/users/cooperatives",
@@ -89,6 +92,8 @@ public class SecurityConfig {
                         .requestMatchers("GET",
                                 "/api/users/directeurs/sddr/mon-profil"
                         ).hasRole("DIRECTEUR_SDDR")
+                        .requestMatchers("/api/users/admin/**")
+                        .hasRole("ADMINISTRATEUR")
 
                         // Tout le reste → authentifié
                         .anyRequest().authenticated()

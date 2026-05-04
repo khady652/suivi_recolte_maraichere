@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
     public class DirecteurSDDR extends Utilisateur {
         private String specialite;
         @Column(name = "id_service_sddr")
-        private Integer idServiceSDDR;
+        private Integer idServiceDepartementale;
         // Méthodes métier
         public void genererRapportAgricol() {
             // logique de génération de rapport

@@ -71,5 +71,18 @@ import sn.agriculture.auth_service.service.AuthService;
             return ResponseEntity.ok(
                     authService.createAccount(request));
         }
+        // PATCH /api/auth/internal/activer/{userId}
+        @PatchMapping("/internal/activer/{userId}")
+        public ResponseEntity<MessageResponse> activerCompte(
+                @PathVariable Integer userId) {
+            return ResponseEntity.ok(authService.activerCompte(userId));
+        }
+
+        // PATCH /api/auth/internal/desactiver/{userId}
+        @PatchMapping("/internal/desactiver/{userId}")
+        public ResponseEntity<MessageResponse> desactiverCompte(
+                @PathVariable Integer userId) {
+            return ResponseEntity.ok(authService.desactiverCompte(userId));
+        }
     }
 

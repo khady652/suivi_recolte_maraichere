@@ -4,4 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import sn.user_service.entity.DirecteurSDDR;
 
 public interface DirecteurSddrRepo extends JpaRepository<DirecteurSDDR, Integer> {
+    boolean existsByIdServiceDepartementale(Integer idServiceDepartementale);
 }

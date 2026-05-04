@@ -41,6 +41,7 @@ import java.util.List;
                 "/v3/api-docs",
                 "/auth-service/v3/api-docs",
                 "/users-service/v3/api-docs",
+                "/geo_service/v3/api-docs",
                 "/webjars"
         );
 

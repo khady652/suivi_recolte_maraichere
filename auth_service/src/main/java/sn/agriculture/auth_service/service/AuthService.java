@@ -152,5 +152,26 @@ import sn.agriculture.auth_service.security.JwtService;
             // ✅ Retourner le userId
             return new MessageResponse("Compte créé avec succès", true, savedUser.getId());
         }
+        //activation et desactivation utilisateur
+        public MessageResponse activerCompte(Integer userId) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() ->
+                            new RuntimeException("Utilisateur introuvable"));
+            user.setActif(true);
+            userRepository.save(user);
+            log.info("Compte activé : {}", userId);
+            return new MessageResponse("Compte activé avec succès", true, userId);
+        }
+
+        // Désactiver
+        public MessageResponse desactiverCompte(Integer userId) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() ->
+                            new RuntimeException("Utilisateur introuvable"));
+            user.setActif(false);
+            userRepository.save(user);
+            log.info("Compte désactivé : {}", userId);
+            return new MessageResponse("Compte désactivé avec succès", true, userId);
+        }
     }
 

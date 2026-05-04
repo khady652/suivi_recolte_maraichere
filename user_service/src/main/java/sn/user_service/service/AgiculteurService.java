@@ -3,6 +3,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sn.user_service.Client.AuthServiceClient;
 import sn.user_service.dto.Requests.AgriculteurRequest;
 import sn.user_service.dto.Responses.AgriculteurReponse;
 import sn.user_service.dto.Responses.MessageResponse;
@@ -28,24 +29,26 @@ import java.util.stream.Collectors;
         private final CooperativeRepository cooperativeRepository;
         private final DirecteurSddrRepo directeurSddrRepo;
         private final ChefCooperatifRepo chefCooperatifRepo;
+        private final AuthServiceClient authServiceClient; // ✅ Ajout
 
         // ── CRÉER ─────────────────────────────────────────────
         @Transactional
         public MessageResponse creer(AgriculteurRequest request) {
 
-            // Validation
             if (request.getNom() == null || request.getNom().isEmpty())
                 throw new UserException("Le nom est obligatoire");
             if (request.getPrenom() == null || request.getPrenom().isEmpty())
                 throw new UserException("Le prénom est obligatoire");
 
-            // Créer l'agriculteur
-            Agriculteur agriculteur = new Agriculteur();
-            
-            if (request.getUserId() != null) {
-                agriculteur.setIdUtilisateur(request.getUserId());
-            }
+            // ✅ Créer le compte dans auth-service
+            Integer userId = authServiceClient.createAccount(
+                    request.getEmail(),
+                    request.getTelephone(),
+                    "AGRICULTEUR"
+            );
 
+            Agriculteur agriculteur = new Agriculteur();
+            agriculteur.setIdUtilisateur(userId); // ✅ userId depuis auth-service
             agriculteur.setNom(request.getNom());
             agriculteur.setPrenom(request.getPrenom());
             agriculteur.setAdresse(request.getAdresse());
@@ -54,9 +57,8 @@ import java.util.stream.Collectors;
             agriculteur.setAnneeExperience(request.getAnneeExperience());
             agriculteur.setNiveauInstruction(request.getNiveauInstruction());
             agriculteur.setRole("AGRICULTEUR");
-            agriculteur.setActif(false);
+            agriculteur.setActif(true); // ✅ true par défaut
 
-            // Coopérative optionnelle
             if (request.getIdCooperative() != null) {
                 Cooperative coop = cooperativeRepository
                         .findById(request.getIdCooperative())

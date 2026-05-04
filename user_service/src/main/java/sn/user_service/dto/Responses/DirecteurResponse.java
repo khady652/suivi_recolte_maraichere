@@ -18,5 +18,8 @@ import lombok.NoArgsConstructor;
         private String specialite;
         private Boolean actif;
         private String nomService;
+
+
     }
+
 

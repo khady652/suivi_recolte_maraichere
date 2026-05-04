@@ -15,8 +15,9 @@ import sn.user_service.dto.Responses.MessageResponse;
 import sn.user_service.service.DirecteurService;
 
 import java.util.List;
+import java.util.Map;
 
-    @RestController
+@RestController
     @RequestMapping("/api/users/directeurs")
     @RequiredArgsConstructor
     @Slf4j
@@ -121,5 +122,22 @@ import java.util.List;
             return ResponseEntity.ok(
                     directeurService.getMonProfilSDDR(userId));
         }
+
+        // GET /api/users/directeurs/sddr/{id}/info
+        @GetMapping("/sddr/{id}/info")
+        public ResponseEntity<Map<String, String>> getSDDRInfo(
+                @PathVariable Integer id) {
+            return ResponseEntity.ok(
+                    directeurService.getSDDRInfo(id));
+        }
+
+        // GET /api/users/directeurs/dr/{id}/info
+        @GetMapping("/dr/{id}/info")
+        public ResponseEntity<Map<String, Object>> getDRInfo(
+                @PathVariable Integer id) {
+            return ResponseEntity.ok(
+                    directeurService.getDRInfo(id));
+        }
+
     }
 

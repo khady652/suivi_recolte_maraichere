@@ -14,17 +14,11 @@ import lombok.NoArgsConstructor;
     @NoArgsConstructor
     @AllArgsConstructor
     public class AdminRequest {
-
-        private Integer userId;
-
         @NotBlank(message = "Le nom est obligatoire")
         private String nom;
-
         @NotBlank(message = "Le prénom est obligatoire")
         private String prenom;
-
         private String adresse;
-
         @Email(message = "Format email invalide")
         private String email;
         @Pattern(

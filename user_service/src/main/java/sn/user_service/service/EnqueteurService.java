@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sn.user_service.Client.AuthServiceClient;
 import sn.user_service.dto.Requests.EnqueteurRequest;
 import sn.user_service.dto.Responses.EnqueteurResponse;
 import sn.user_service.dto.Responses.MessageResponse;
@@ -22,6 +23,7 @@ public class EnqueteurService {
 
     private final EnqueteurRepo enqueteurRepository;
     private final UtilisateurRepository utilisateurRepository;
+    private final AuthServiceClient authServiceClient; // ✅ Ajout
 
     // ── CRÉER ─────────────────────────────────────────────
     @Transactional
@@ -34,10 +36,15 @@ public class EnqueteurService {
                 utilisateurRepository.existsByEmail(request.getEmail()))
             throw new UserException("Cet email est déjà utilisé");
 
+        // ✅ Créer le compte dans auth-service
+        Integer userId = authServiceClient.createAccount(
+                request.getEmail(),
+                request.getTelephone(),
+                "ENQUETEUR_MARCHE"
+        );
+
         EnqueteurMarche enqueteur = new EnqueteurMarche();
-        if (request.getUserId() != null) {
-            enqueteur.setIdUtilisateur(request.getUserId());
-        }
+        enqueteur.setIdUtilisateur(userId); // ✅ userId depuis auth-service
         enqueteur.setNom(request.getNom());
         enqueteur.setPrenom(request.getPrenom());
         enqueteur.setAdresse(request.getAdresse());
@@ -46,7 +53,7 @@ public class EnqueteurService {
         enqueteur.setOrganisation(request.getOrganisation());
         enqueteur.setZoneAffectation(request.getZoneAffectation());
         enqueteur.setRole("ENQUETEUR_MARCHE");
-        enqueteur.setActif(false);
+        enqueteur.setActif(true); // ✅ true par défaut
 
         enqueteurRepository.save(enqueteur);
         log.info("Enquêteur créé : {}", request.getNom());
@@ -126,6 +133,7 @@ public class EnqueteurService {
         response.setActif(e.getActif());
         return response;
     }
+
     public EnqueteurResponse getMonProfil(Integer userId) {
         EnqueteurMarche enqueteur = enqueteurRepository
                 .findById(userId)
