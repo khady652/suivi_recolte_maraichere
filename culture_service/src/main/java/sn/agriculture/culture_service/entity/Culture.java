@@ -21,13 +21,13 @@ public class Culture {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idCulture;
 
-    private String type;           // ✅ Ajout ex: "oignon", "mil"
+    private String type;
     private String variete;
     private LocalDate dateSemence;
     private LocalDate datePremierRecoltePrevu;
     private String typeIrrigation;
     private Double quantiteSeme;
-    private Double superficiCultive; // ✅ Double au lieu de String
+    private Double superficiCultive;
     private String saison;
     private Double quantiteRecoltePrevu;
     private String intraUtilise;
