@@ -143,6 +143,8 @@ public class ServiceDepartementaleService {
         response.setLocalite(s.getLocalite());
         response.setNomDepartement(
                 s.getDepartement().getNomDepartement());
+        response.setIdDepartement(
+                s.getDepartement().getIdDepartement()); // ✅ Ajout
 
         // ✅ Récupérer nom et prénom du directeur SDDR
         if (s.getIdDirecteurSddr() != null) {

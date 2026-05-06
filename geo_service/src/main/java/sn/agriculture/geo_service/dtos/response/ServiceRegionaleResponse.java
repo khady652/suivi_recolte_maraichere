@@ -19,5 +19,6 @@ import lombok.AllArgsConstructor;
         //enplus nom et prenom de son directeur
         private String nomDirecteur;
         private String prenomDirecteur;
+        private Integer idRegion;
     }
 

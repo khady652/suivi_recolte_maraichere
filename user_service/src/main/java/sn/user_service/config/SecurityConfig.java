@@ -3,6 +3,7 @@ package sn.user_service.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -26,15 +27,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
 
-                        // ── ROUTES PUBLIQUES ──────────────────────────
-                        .requestMatchers("GET",
-                                "/api/users/cooperatives",
-                                "/api/users/cooperatives/**",
-                                "/api/users/agriculteurs",
-                                "/api/users/agriculteurs/**"
-                        ).permitAll()
-
-                        // Swagger
+                        // ── Swagger ───────────────────────────────────
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/v3/api-docs.yaml",
@@ -42,13 +35,27 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/webjars/**"
                         ).permitAll()
+
+                        // ── Actuator ──────────────────────────────────
                         .requestMatchers("/actuator/health").permitAll()
-                        .requestMatchers("GET",
+
+                        // ── Endpoints internes AVANT hasRole ✅ ───────
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/users/agriculteurs/*/info",
                                 "/api/users/directeurs/sddr/*/info",
                                 "/api/users/directeurs/dr/*/info"
                         ).permitAll()
+
+                        // ── ROUTES PUBLIQUES ──────────────────────────
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/users/cooperatives",
+                                "/api/users/cooperatives/**",
+                                "/api/users/agriculteurs",
+                                "/api/users/agriculteurs/**"
+                        ).permitAll()
+
                         // ── ADMINISTRATEUR ────────────────────────────
-                        .requestMatchers("POST",
+                        .requestMatchers(HttpMethod.POST,
                                 "/api/users/cooperatives",
                                 "/api/users/administrateurs",
                                 "/api/users/directeurs/**",
@@ -57,45 +64,47 @@ public class SecurityConfig {
                                 "/api/users/chefs-cooperatifs"
                         ).hasRole("ADMINISTRATEUR")
 
-                        .requestMatchers("PUT",
+                        .requestMatchers(HttpMethod.PUT,
                                 "/api/users/cooperatives/**",
                                 "/api/users/administrateurs/**"
                         ).hasRole("ADMINISTRATEUR")
 
-                        .requestMatchers("DELETE",
+                        .requestMatchers(HttpMethod.DELETE,
                                 "/api/users/cooperatives/**",
                                 "/api/users/administrateurs/**"
                         ).hasRole("ADMINISTRATEUR")
 
-                        .requestMatchers("GET",
+                        .requestMatchers(HttpMethod.GET,
                                 "/api/users/administrateurs",
                                 "/api/users/administrateurs/**"
                         ).hasRole("ADMINISTRATEUR")
 
                         // ── AGRICULTEUR ───────────────────────────────
-                        .requestMatchers("GET",
+                        .requestMatchers(HttpMethod.GET,
                                 "/api/users/agriculteurs/mon-profil"
                         ).hasRole("AGRICULTEUR")
 
                         // ── CHEF COOPERATIF ───────────────────────────
-                        .requestMatchers("GET",
+                        .requestMatchers(HttpMethod.GET,
                                 "/api/users/chefs-cooperatifs/mon-profil",
                                 "/api/users/agriculteurs/mes-agriculteurs"
                         ).hasRole("CHEF_COOPERATIF")
 
                         // ── DIRECTEUR DR ──────────────────────────────
-                        .requestMatchers("GET",
+                        .requestMatchers(HttpMethod.GET,
                                 "/api/users/directeurs/dr/mon-profil"
                         ).hasRole("DIRECTEUR_DR")
 
                         // ── DIRECTEUR SDDR ────────────────────────────
-                        .requestMatchers("GET",
+                        .requestMatchers(HttpMethod.GET,
                                 "/api/users/directeurs/sddr/mon-profil"
                         ).hasRole("DIRECTEUR_SDDR")
+
+                        // ── ADMIN ─────────────────────────────────────
                         .requestMatchers("/api/users/admin/**")
                         .hasRole("ADMINISTRATEUR")
 
-                        // Tout le reste → authentifié
+                        // ── Tout le reste → authentifié ───────────────
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter,

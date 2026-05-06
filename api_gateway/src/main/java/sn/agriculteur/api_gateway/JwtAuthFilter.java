@@ -32,6 +32,8 @@ import java.util.List;
                 "/api/auth/health",
                 "/api/users/agriculteurs",
                 "/api/users/cooperatives",
+                "/api/culture/parcelles/departement",
+                "/api/culture/parcelles/region",
                 "/actuator/health",
                 "/api/auth/internal",
 
@@ -42,6 +44,7 @@ import java.util.List;
                 "/auth-service/v3/api-docs",
                 "/users-service/v3/api-docs",
                 "/geo_service/v3/api-docs",
+                "/culture_service/v3/api-docs",
                 "/webjars"
         );
 

@@ -18,6 +18,7 @@ import sn.user_service.repository.CooperativeRepository;
 import sn.user_service.repository.DirecteurSddrRepo;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
     @Service
@@ -207,6 +208,16 @@ import java.util.stream.Collectors;
                     .stream()
                     .map(this::toResponse)
                     .collect(Collectors.toList());
+        }
+        public Map<String, String> getInfo(Integer id) {
+            Agriculteur agriculteur = agriculteurRepository
+                    .findById(id)
+                    .orElseThrow(() ->
+                            new UserException("Agriculteur introuvable"));
+            return Map.of(
+                    "nom", agriculteur.getNom(),
+                    "prenom", agriculteur.getPrenom()
+            );
         }
         }
 

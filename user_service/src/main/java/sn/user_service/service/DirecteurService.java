@@ -320,14 +320,16 @@ public class DirecteurService {
                         new UserException("Profil introuvable"));
         return toSDDRResponse(directeur);
     }
-    public Map<String, String> getSDDRInfo(Integer id) {
+    public Map<String, Object> getSDDRInfo(Integer id) {
         DirecteurSDDR directeur = directeurSDDRRepository
                 .findById(id)
                 .orElseThrow(() ->
                         new UserException("Directeur introuvable"));
         return Map.of(
                 "nom", directeur.getNom(),
-                "prenom", directeur.getPrenom()
+                "prenom", directeur.getPrenom(),
+                "idServiceDepartementale", directeur.getIdServiceDepartementale() != null
+                        ? directeur.getIdServiceDepartementale() : ""
         );
     }
 

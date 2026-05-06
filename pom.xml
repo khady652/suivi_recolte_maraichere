@@ -22,6 +22,7 @@
         <module>user_service</module>
         <module>geo_service</module>
         <module>api_gateway</module>
+        <module>culture_service</module>
     </modules>
 
     <properties>

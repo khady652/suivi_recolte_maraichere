@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
         private String emailService;
         private String localite;
         private String nomDepartement;
+        private Integer idDepartement;
 
         //enplus nom et prenom de son directeur
         private String nomDirecteur;

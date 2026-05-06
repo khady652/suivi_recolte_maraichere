@@ -16,8 +16,9 @@ import sn.user_service.dto.Responses.MessageResponse;
 import sn.user_service.service.AgiculteurService;
 
 import java.util.List;
+import java.util.Map;
 
-    @RestController
+@RestController
     @RequestMapping("/api/users/agriculteurs")
     @RequiredArgsConstructor
     @Slf4j
@@ -78,6 +79,12 @@ import java.util.List;
                     .replace("ROLE_", "");
             return ResponseEntity.ok(
                     agriculteurService.getAgriculteursByRole(userId, role));
+        }
+        @GetMapping("/{id}/info")
+        public ResponseEntity<Map<String, String>> getInfo(
+                @PathVariable Integer id) {
+            return ResponseEntity.ok(
+                    agriculteurService.getInfo(id));
         }
     }
 

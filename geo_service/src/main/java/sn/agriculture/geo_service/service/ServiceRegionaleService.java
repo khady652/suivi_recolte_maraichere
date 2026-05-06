@@ -135,6 +135,7 @@ public class ServiceRegionaleService {
         response.setEmailService(s.getEmailService());
         response.setLocalite(s.getLocalite());
         response.setNomRegion(s.getRegion().getNomRegion());
+        response.setIdRegion(s.getRegion().getIdRegion());
         if (s.getIdDirecteurDrdr() != null) {
             // ✅ nomDirecteur sera rempli via RestClient plus tard
         }

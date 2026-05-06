@@ -125,7 +125,7 @@ import java.util.Map;
 
         // GET /api/users/directeurs/sddr/{id}/info
         @GetMapping("/sddr/{id}/info")
-        public ResponseEntity<Map<String, String>> getSDDRInfo(
+        public ResponseEntity<Map<String, Object>> getSDDRInfo(
                 @PathVariable Integer id) {
             return ResponseEntity.ok(
                     directeurService.getSDDRInfo(id));
