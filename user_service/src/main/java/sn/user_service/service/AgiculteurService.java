@@ -209,16 +209,7 @@ import java.util.stream.Collectors;
                     .map(this::toResponse)
                     .collect(Collectors.toList());
         }
-        /*public Map<String, String> getInfo(Integer id) {
-            Agriculteur agriculteur = agriculteurRepository
-                    .findById(id)
-                    .orElseThrow(() ->
-                            new UserException("Agriculteur introuvable"));
-            return Map.of(
-                    "nom", agriculteur.getNom(),
-                    "prenom", agriculteur.getPrenom()
-            );
-        }*/
+
         public Map<String, String> getInfo(Integer id) {
             Agriculteur agriculteur = agriculteurRepository
                     .findById(id)
@@ -229,6 +220,35 @@ import java.util.stream.Collectors;
                     "prenom", agriculteur.getPrenom(),
                     "telephone", agriculteur.getTelephone() != null
                             ? agriculteur.getTelephone() : ""
+            );
+        }
+        // recuperation des information du chef de la cooperative
+
+        public Map<String, String> getChefInfo(Integer idAgriculteur) {
+            Agriculteur agriculteur = agriculteurRepository
+                    .findById(idAgriculteur)
+                    .orElseThrow(() ->
+                            new UserException("Agriculteur introuvable"));
+
+            // Vérifier si l'agriculteur a une coopérative
+            if (agriculteur.getCooperative() == null) {
+                log.warn("Agriculteur {} sans coopérative", idAgriculteur);
+                return null;
+            }
+
+            // Récupérer le chef de la coopérative
+            ChefCooperatif chef = chefCooperatifRepo
+                    .findByCooperativeIdCooperation(
+                            agriculteur.getCooperative().getIdCooperation())
+                    .orElse(null);
+
+            if (chef == null) return null;
+
+            return Map.of(
+                    "nom", chef.getNom(),
+                    "prenom", chef.getPrenom(),
+                    "telephone", chef.getTelephone() != null
+                            ? chef.getTelephone() : ""
             );
         }
         }

@@ -216,5 +216,6 @@ import java.util.stream.Collectors;
 
             return ResponseEntity.ok(statsByRegion);
         }
+
     }
 

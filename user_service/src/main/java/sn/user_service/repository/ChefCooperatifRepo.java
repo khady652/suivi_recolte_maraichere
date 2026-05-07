@@ -9,4 +9,6 @@ public interface ChefCooperatifRepo extends JpaRepository<ChefCooperatif, Intege
     Optional<ChefCooperatif> findByCooperativeIdCooperation(
             Integer idCooperation);
     Optional<ChefCooperatif> findByIdUtilisateur(Integer idUtilisateur);
+
+
 }

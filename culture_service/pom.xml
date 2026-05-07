@@ -102,6 +102,12 @@
             <version>2.8.6</version>
         </dependency>
 
+        <!-- twilio -->
+        <dependency>
+            <groupId>com.twilio.sdk</groupId>
+            <artifactId>twilio</artifactId>
+            <version>9.3.0</version>
+        </dependency>
     </dependencies>
 
     <build>

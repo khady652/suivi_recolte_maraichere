@@ -42,6 +42,7 @@ public class SecurityConfig {
                         // ── Endpoints internes AVANT hasRole ✅ ───────
                         .requestMatchers(HttpMethod.GET,
                                 "/api/users/agriculteurs/*/info",
+                                "/api/users/agriculteurs/*/chef-info",
                                 "/api/users/directeurs/sddr/*/info",
                                 "/api/users/directeurs/dr/*/info"
                         ).permitAll()

@@ -86,5 +86,12 @@ import java.util.Map;
             return ResponseEntity.ok(
                     agriculteurService.getInfo(id));
         }
+        //nous avon sici les endpoints pour le recuperer les information du chef de cooperatif
+    @GetMapping("/{id}/chef-info")
+    public ResponseEntity<Map<String, String>> getChefInfo(
+            @PathVariable Integer id) {
+        return ResponseEntity.ok(
+                agriculteurService.getChefInfo(id));
+    }
     }
 

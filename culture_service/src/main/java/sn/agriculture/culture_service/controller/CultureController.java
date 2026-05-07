@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import sn.agriculture.culture_service.dtos.request.CultureRequest;
 import sn.agriculture.culture_service.dtos.response.CultureResponse;
+import sn.agriculture.culture_service.service.AlertService;
 import sn.agriculture.culture_service.service.CultureService;
 import sn.agriculture.culture_service.client.GeoServiceClient;
 
@@ -22,7 +23,7 @@ import java.util.List;
 
         private final CultureService cultureService;
         private final GeoServiceClient geoServiceClient;
-
+        private final AlertService alerteRecolteService;
         // ── CRÉER ─────────────────────────────────────────────
         @PostMapping
         public ResponseEntity<CultureResponse> creer(
@@ -104,6 +105,13 @@ import java.util.List;
                 @PathVariable Long id) {
             cultureService.supprimer(id);
             return ResponseEntity.noContent().build();
+        }
+        @GetMapping("/test-alerte/{idCulture}")
+        public ResponseEntity<String> testerAlerte(
+                @PathVariable Long idCulture) {
+            alerteRecolteService.testerAlerte(idCulture);
+            return ResponseEntity.ok(
+                    "Alerte SMS envoyée pour culture " + idCulture);
         }
     }
 
