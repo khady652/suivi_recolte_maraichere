@@ -23,7 +23,7 @@ public class Recolte {
     private LocalDate dateRecolte;
     private Double quantiteRecolte;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_culture")
     private Culture culture;
 

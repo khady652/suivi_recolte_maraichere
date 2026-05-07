@@ -209,7 +209,7 @@ import java.util.stream.Collectors;
                     .map(this::toResponse)
                     .collect(Collectors.toList());
         }
-        public Map<String, String> getInfo(Integer id) {
+        /*public Map<String, String> getInfo(Integer id) {
             Agriculteur agriculteur = agriculteurRepository
                     .findById(id)
                     .orElseThrow(() ->
@@ -217,6 +217,18 @@ import java.util.stream.Collectors;
             return Map.of(
                     "nom", agriculteur.getNom(),
                     "prenom", agriculteur.getPrenom()
+            );
+        }*/
+        public Map<String, String> getInfo(Integer id) {
+            Agriculteur agriculteur = agriculteurRepository
+                    .findById(id)
+                    .orElseThrow(() ->
+                            new UserException("Agriculteur introuvable"));
+            return Map.of(
+                    "nom", agriculteur.getNom(),
+                    "prenom", agriculteur.getPrenom(),
+                    "telephone", agriculteur.getTelephone() != null
+                            ? agriculteur.getTelephone() : ""
             );
         }
         }

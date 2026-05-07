@@ -100,4 +100,19 @@ public class UserServiceClient {
             return null;
         }
     }
+
+    public Map<String, String> getChefCooperatifByAgriculteur(
+            Integer idAgriculteur) {
+        try {
+            return restClient.get()
+                    .uri("/api/users/agriculteurs/{id}/chef-info",
+                            idAgriculteur)
+                    .retrieve()
+                    .body(new ParameterizedTypeReference<>() {});
+        } catch (Exception e) {
+            log.error("Erreur récupération chef : {}",
+                    e.getMessage());
+            return null;
+        }
+    }
 }

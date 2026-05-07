@@ -19,8 +19,6 @@ public class CultureRequest {
 
     @NotNull(message = "La date de semence est obligatoire")
     private LocalDate dateSemence;
-
-    private LocalDate datePremierRecoltePrevu;
     private String typeIrrigation;
     private Double quantiteSeme;
     private Double superficiCultive;

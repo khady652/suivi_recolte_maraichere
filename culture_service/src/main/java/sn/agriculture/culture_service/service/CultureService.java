@@ -15,6 +15,7 @@ import sn.agriculture.culture_service.repository.ParcelleRepos;
 import sn.agriculture.culture_service.util.AgriculteurResponse;
 import sn.agriculture.culture_service.util.DepartementResponse;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,29 +31,31 @@ import java.util.stream.Collectors;
         private final GeoServiceClient geoServiceClient;
 
         // ── CRÉER ─────────────────────────────────────────────
+
         @Transactional
         public CultureResponse creer(CultureRequest request,
                                      Long userId, String role) {
 
-            // Vérifier que la parcelle existe
             Parcelle parcelle = parcelleRepository
                     .findById(request.getIdParcel())
                     .orElseThrow(() -> new CultureException(
                             "Parcelle introuvable !"));
 
-            // Vérifier les droits selon le rôle
             if (role.equals("AGRICULTEUR") &&
                     !parcelle.getIdAgriculteur().equals(userId)) {
                 throw new CultureException(
                         "Cette parcelle ne vous appartient pas !");
             }
 
+            // ✅ Calcul automatique date récolte
+            LocalDate dateRecoltePrevu = calculerDateRecolte(
+                    request.getType(), request.getDateSemence());
+
             Culture culture = Culture.builder()
                     .type(request.getType())
                     .variete(request.getVariete())
                     .dateSemence(request.getDateSemence())
-                    .datePremierRecoltePrevu(
-                            request.getDatePremierRecoltePrevu())
+                    .datePremierRecoltePrevu(dateRecoltePrevu) // ✅ Automatique
                     .typeIrrigation(request.getTypeIrrigation())
                     .quantiteSeme(request.getQuantiteSeme())
                     .superficiCultive(request.getSuperficiCultive())
@@ -60,15 +63,32 @@ import java.util.stream.Collectors;
                     .intraUtilise(request.getIntraUtilise())
                     .intraSuplementaire(request.getIntraSuplementaire())
                     .engrais(request.getEngrais())
-                    .quantiteRecoltePrevu(null) // ✅ ML plus tard
+                    .quantiteRecoltePrevu(null)
                     .parcelle(parcelle)
                     .build();
 
             cultureRepository.save(culture);
-            log.info("Culture {} créée sur parcelle {}",
-                    request.getType(), request.getIdParcel());
+            log.info("Culture {} créée sur parcelle {} - " +
+                            "Récolte prévue : {}",
+                    request.getType(), request.getIdParcel(),
+                    dateRecoltePrevu);
 
             return toResponse(culture);
+        }
+
+        // ✅ Calcul automatique selon type
+        private LocalDate calculerDateRecolte(
+                String type, LocalDate dateSemence) {
+            if (dateSemence == null) return null;
+            return switch (type.toLowerCase()) {
+                case "oignon"   -> dateSemence.plusMonths(4);
+                case "tomate"   -> dateSemence.plusMonths(3);
+                case "mil"      -> dateSemence.plusMonths(3);
+                case "arachide" -> dateSemence.plusMonths(4);
+                case "mais"     -> dateSemence.plusMonths(3);
+                case "niebe"    -> dateSemence.plusMonths(2);
+                default         -> dateSemence.plusMonths(3);
+            };
         }
 
         // ── LIRE PAR PARCELLE ─────────────────────────────────

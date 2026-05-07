@@ -13,4 +13,5 @@ public interface CultureRepos extends JpaRepository<Culture, Long> {
     List<Culture> findBySaison(String saison);
     List<Culture> findByVarieteAndSaison(String variete, String saison);
     List<Culture> findByType(String type);
+    List<Culture> findByParcelle_IdParcelIn(List<Long> idParcels);
 }

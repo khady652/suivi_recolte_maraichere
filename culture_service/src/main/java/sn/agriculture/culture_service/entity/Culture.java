@@ -34,7 +34,7 @@ public class Culture {
     private Boolean intraSuplementaire;
     private Boolean engrais;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_parcel")
     private Parcelle parcelle;
 
