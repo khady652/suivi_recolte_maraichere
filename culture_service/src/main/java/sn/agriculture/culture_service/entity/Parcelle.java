@@ -10,10 +10,13 @@ import java.util.List;
 
 @Entity
 @Table(name = "parcelle")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(exclude = "cultures")
+@EqualsAndHashCode(exclude = "cultures")
 public class Parcelle {
 
     @Id
@@ -24,7 +27,7 @@ public class Parcelle {
     private String lieu;
     private Double superficie;
     private String typeSol;
-    private String qualiteSol; // ✅ Ajout pour ML
+    private String qualiteSol;
     private String sourceEau;
     private Boolean estIrriguee;
     private Long idAgriculteur;

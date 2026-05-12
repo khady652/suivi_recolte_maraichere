@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sn.agriculture.culture_service.client.GeoServiceClient;
 import sn.agriculture.culture_service.client.UserServiceClient;
+import sn.agriculture.culture_service.dtos.response.HistoriqueCultureResponse;
 import sn.agriculture.culture_service.entity.Culture;
 import sn.agriculture.culture_service.entity.Recolte;
 import sn.agriculture.culture_service.repository.CultureRepos;
@@ -457,5 +458,37 @@ public class ProductionService {
                 }));
 
         return buildAvancement(byAgriculteur, aujourd_hui);
+    }
+    public HistoriqueCultureResponse getSurfaceAnneeCourante(
+            List<Long> idDepartements,
+            String nomTerritoire,
+            String typeTerritoire) {
+
+        int annee = LocalDate.now().getYear();
+        Double surface = cultureRepository
+                .surfaceAnneeCourante(idDepartements, annee);
+
+        return HistoriqueCultureResponse.builder()
+                .annee(annee)
+                .surfaceCultivee(surface != null ? surface : 0.0)
+
+                .build();
+    }
+
+    public List<HistoriqueCultureResponse> getHistoriqueSurface(
+            List<Long> idDepartements,
+            String nomTerritoire,
+            String typeTerritoire) {
+
+        return cultureRepository
+                .historiqueSurfaceParDepartements(idDepartements)
+                .stream()
+                .map(row -> HistoriqueCultureResponse.builder()
+                        .annee(((Number) row[0]).intValue())
+                        .surfaceCultivee(
+                                ((Number) row[1]).doubleValue())
+
+                        .build())
+                .collect(Collectors.toList());
     }
 }

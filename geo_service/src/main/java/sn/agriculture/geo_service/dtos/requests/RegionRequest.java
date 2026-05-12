@@ -16,6 +16,6 @@ import lombok.AllArgsConstructor;
         private String nomRegion;
 
         private Integer population;
-        private String superficie;
+        private Double superficie;
     }
 

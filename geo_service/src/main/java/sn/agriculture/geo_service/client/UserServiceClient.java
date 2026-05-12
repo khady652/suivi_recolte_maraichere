@@ -2,6 +2,7 @@ package sn.agriculture.geo_service.client;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -19,49 +20,86 @@ import java.util.Map;
             this.restClient = builder.baseUrl(usersBaseUrl).build();
         }
 
+        // ── NOM PRÉNOM DIRECTEUR SDDR ─────────────────────────
         public String[] getNomPrenomDirecteurSDDR(Integer idDirecteur) {
             try {
-                var response = restClient.get()
-                        .uri("/api/users/directeurs/sddr/" + idDirecteur + "/info")
+                Map<String, Object> response = restClient.get()
+                        .uri("/api/users/directeurs/sddr/{id}/info",
+                                idDirecteur)
                         .retrieve()
-                        .toEntity(Map.class);
-                String nom = (String) response.getBody().get("nom");
-                String prenom = (String) response.getBody().get("prenom");
-                return new String[]{nom, prenom};
+                        .body(new ParameterizedTypeReference<Map<String, Object>>() {});
+                if (response == null)
+                    return new String[]{null, null};
+                return new String[]{
+                        (String) response.get("nom"),
+                        (String) response.get("prenom")
+                };
             } catch (Exception e) {
-                log.error("Erreur récupération directeur SDDR : {}",
-                        e.getMessage());
+                log.error("Erreur récupération directeur SDDR {} : {}",
+                        idDirecteur, e.getMessage());
                 return new String[]{null, null};
             }
         }
 
+        // ── NOM PRÉNOM DIRECTEUR DR ───────────────────────────
         public String[] getNomPrenomDirecteurDR(Integer idDirecteur) {
             try {
-                var response = restClient.get()
-                        .uri("/api/users/directeurs/dr/" + idDirecteur + "/info")
+                Map<String, Object> response = restClient.get()
+                        .uri("/api/users/directeurs/dr/{id}/info",
+                                idDirecteur)
                         .retrieve()
-                        .toEntity(Map.class);
-                String nom = (String) response.getBody().get("nom");
-                String prenom = (String) response.getBody().get("prenom");
-                return new String[]{nom, prenom};
+                        .body(new ParameterizedTypeReference<Map<String, Object>>() {});
+                if (response == null)
+                    return new String[]{null, null};
+                return new String[]{
+                        (String) response.get("nom"),
+                        (String) response.get("prenom")
+                };
             } catch (Exception e) {
-                log.error("Erreur récupération directeur DR : {}",
-                        e.getMessage());
+                log.error("Erreur récupération directeur DR {} : {}",
+                        idDirecteur, e.getMessage());
                 return new String[]{null, null};
             }
         }
-        public Integer getIdServiceRegionalByDirecteurDR(Integer userId) {
+
+        // ── INFO COMPLÈTE DIRECTEUR SDDR ──────────────────────
+        public Map<String, Object> getSDDRInfo(Integer userId) {
             try {
-                var response = restClient.get()
-                        .uri("/api/users/directeurs/dr/" + userId + "/info")
+                return restClient.get()
+                        .uri("/api/users/directeurs/sddr/{id}/info", userId)
                         .retrieve()
-                        .toEntity(Map.class);
-                return (Integer) response.getBody()
-                        .get("idServiceRegional");
+                        .body(new ParameterizedTypeReference<Map<String, Object>>() {});
             } catch (Exception e) {
-                log.error("Erreur récupération directeur DR : {}",
-                        e.getMessage());
+                log.error("Erreur récupération SDDR {} : {}",
+                        userId, e.getMessage());
                 return null;
             }
         }
-    }
+
+        // ── INFO COMPLÈTE DIRECTEUR DR ────────────────────────
+        public Map<String, Object> getDRInfo(Integer userId) {
+            try {
+                return restClient.get()
+                        .uri("/api/users/directeurs/dr/{id}/info", userId)
+                        .retrieve()
+                        .body(new ParameterizedTypeReference<Map<String, Object>>() {});
+            } catch (Exception e) {
+                log.error("Erreur récupération DR {} : {}",
+                        userId, e.getMessage());
+                return null;
+            }
+        }
+
+        // ── ID SERVICE RÉGIONAL PAR DIRECTEUR DR ──────────────
+        public Integer getIdServiceRegionalByDirecteurDR(Integer userId) {
+            try {
+                Map<String, Object> info = getDRInfo(userId);
+                return info != null
+                        ? (Integer) info.get("idServiceRegional")
+                        : null;
+            } catch (Exception e) {
+                log.error("Erreur récupération service DR {} : {}",
+                        userId, e.getMessage());
+                return null;
+            }
+        }}

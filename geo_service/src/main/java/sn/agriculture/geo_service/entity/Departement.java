@@ -26,7 +26,7 @@ import java.util.List;
         private String nomDepartement;
 
         private Integer population;
-        private String superficie;
+        private double superficie;
 
         @Transient
         private Double surfaceCultivee;

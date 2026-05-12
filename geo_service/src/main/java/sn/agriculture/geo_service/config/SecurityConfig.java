@@ -37,31 +37,42 @@ public class SecurityConfig {
                                 "/webjars/**"
                         ).permitAll()
 
-                        // ── Actuator ──────────────────────────────────
+                        // ── Actuator + Error ──────────────────────────
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/error").permitAll()
 
-                        // ── Endpoints internes AVANT hasRole ✅ ───────
+                        // ── Endpoints internes (autres microservices) ─
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/geo/services-departementaux/*",
+                                "/api/geo/services-regionaux/*",
+                                "/api/geo/departements/*",
+                                "/api/geo/regions/*"
+                        ).permitAll()
+
+                        // ── Endpoints affectation ─────────────────────
                         .requestMatchers(HttpMethod.PATCH,
                                 "/api/geo/services-regionaux/*/affecter-directeur",
                                 "/api/geo/services-departementaux/*/affecter-directeur"
-                        ).permitAll()
+                        ).hasRole("ADMINISTRATEUR")
 
-                        // ✅ Lecture interne par les autres services
+                        // ── DIRECTEUR SDDR → son département ──────────
                         .requestMatchers(HttpMethod.GET,
-                                "/api/geo/services-departementaux/*",
-                                "/api/geo/services-regionaux/*"
-                        ).permitAll()
+                                "/api/geo/departements/mon-departement"
+                        ).hasRole("DIRECTEUR_SDDR")
 
-                        // ── Lecture publique ──────────────────────────
+                        // ── DIRECTEUR DR → sa région ──────────────────
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/geo/regions/ma-region"
+                        ).hasRole("DIRECTEUR_DR")
+
+                        // ── ADMINISTRATEUR → CRUD ─────────────────────
                         .requestMatchers(HttpMethod.GET,
                                 "/api/geo/regions",
-                                "/api/geo/regions/**",
                                 "/api/geo/departements",
-                                "/api/geo/departements/**"
-                        ).permitAll()
+                                "/api/geo/services-regionaux",
+                                "/api/geo/services-departementaux"
+                        ).hasRole("ADMINISTRATEUR")
 
-                        // ── Admin POST ────────────────────────────────
                         .requestMatchers(HttpMethod.POST,
                                 "/api/geo/regions",
                                 "/api/geo/departements",
@@ -69,7 +80,6 @@ public class SecurityConfig {
                                 "/api/geo/services-departementaux"
                         ).hasRole("ADMINISTRATEUR")
 
-                        // ── Admin PUT ─────────────────────────────────
                         .requestMatchers(HttpMethod.PUT,
                                 "/api/geo/regions/**",
                                 "/api/geo/departements/**",
@@ -77,18 +87,11 @@ public class SecurityConfig {
                                 "/api/geo/services-departementaux/**"
                         ).hasRole("ADMINISTRATEUR")
 
-                        // ── Admin DELETE ──────────────────────────────
                         .requestMatchers(HttpMethod.DELETE,
                                 "/api/geo/regions/**",
                                 "/api/geo/departements/**",
                                 "/api/geo/services-regionaux/**",
                                 "/api/geo/services-departementaux/**"
-                        ).hasRole("ADMINISTRATEUR")
-
-                        // ── Admin GET liste complète ──────────────────
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/geo/services-regionaux",
-                                "/api/geo/services-departementaux"
                         ).hasRole("ADMINISTRATEUR")
 
                         // ── Tout le reste → authentifié ───────────────

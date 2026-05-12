@@ -23,6 +23,7 @@
         <module>geo_service</module>
         <module>api_gateway</module>
         <module>culture_service</module>
+        <module>marche_service</module>
     </modules>
 
     <properties>

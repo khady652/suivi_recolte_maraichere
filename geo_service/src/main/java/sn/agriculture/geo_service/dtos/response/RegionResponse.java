@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
         private Integer idRegion;
         private String nomRegion;
         private Integer population;
-        private String superficie;
+        private Double superficie;
         private Double surfaceCultivee;
         private String nomServiceRegionale;
     }

@@ -88,7 +88,15 @@ public class SecurityConf {
                         .requestMatchers(HttpMethod.GET,
                                 "/api/culture/cultures/mon-departement"
                         ).hasRole("DIRECTEUR_SDDR")
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/culture/productions/mon-departement/surface-cultivee",
+                                "/api/culture/productions/mon-departement/historique"
+                        ).hasRole("DIRECTEUR_SDDR")
 
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/culture/productions/ma-region/surface-cultivee",
+                                "/api/culture/productions/ma-region/historique"
+                        ).hasRole("DIRECTEUR_DR")
                         .requestMatchers(HttpMethod.GET,
                                 "/api/culture/cultures/ma-region"
                         ).hasRole("DIRECTEUR_DR")
@@ -164,7 +172,10 @@ public class SecurityConf {
                         .requestMatchers(HttpMethod.GET,
                                 "/api/culture/productions/ma-cooperative/**"
                         ).hasRole("CHEF_COOPERATIF")
-
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/culture/productions/departement/*/surface-cultivee",
+                                "/api/culture/productions/region/*/surface-cultivee"
+                        ).permitAll()
                         // ── Tout le reste → authentifié ───────────────
                         .anyRequest().authenticated()
                 )

@@ -15,7 +15,7 @@ import lombok.AllArgsConstructor;
         private String nomDepartement;
 
         private Integer population;
-        private String superficie;
+        private Double superficie;
 
         @NotNull(message = "La région est obligatoire")
         private Integer idRegion;

@@ -11,10 +11,13 @@ import java.util.List;
 
 @Entity
 @Table(name = "culture")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(exclude = {"parcelle", "recoltes"})
+@EqualsAndHashCode(exclude = {"parcelle", "recoltes"})
 public class Culture {
 
     @Id
@@ -34,7 +37,7 @@ public class Culture {
     private Boolean intraSuplementaire;
     private Boolean engrais;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_parcel")
     private Parcelle parcelle;
 

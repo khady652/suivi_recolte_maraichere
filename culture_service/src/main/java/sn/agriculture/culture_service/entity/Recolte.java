@@ -10,10 +10,13 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "recolte")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(exclude = "culture")
+@EqualsAndHashCode(exclude = "culture")
 public class Recolte {
 
     @Id
@@ -23,7 +26,7 @@ public class Recolte {
     private LocalDate dateRecolte;
     private Double quantiteRecolte;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_culture")
     private Culture culture;
 
