@@ -44,7 +44,9 @@ public class SecurityConfig {
                                 "/api/users/agriculteurs/*/info",
                                 "/api/users/agriculteurs/*/chef-info",
                                 "/api/users/directeurs/sddr/*/info",
-                                "/api/users/directeurs/dr/*/info"
+                                "/api/users/directeurs/dr/*/info",
+                                "/api/users/decideurs",
+                                "/api/users/enqueteurs/*/info"
                         ).permitAll()
 
                         // ── ROUTES PUBLIQUES ──────────────────────────

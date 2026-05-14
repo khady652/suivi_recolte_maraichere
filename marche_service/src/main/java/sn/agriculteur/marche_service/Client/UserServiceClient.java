@@ -6,6 +6,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -75,6 +76,19 @@ public class UserServiceClient {
         } catch (Exception e) {
             log.error("Échec envoi alerte prix : {}",
                     e.getMessage());
+        }
+    }
+    // ── TOUS LES DÉCIDEURS ARM ────────────────────────────
+    public List<Map<String, String>> getAllDecideurs() {
+        try {
+            return restClient.get()
+                    .uri("/api/users/decideurs")
+                    .retrieve()
+                    .body(new ParameterizedTypeReference <List<Map<String, String>>>() {});
+        } catch (Exception e) {
+            log.error("Erreur récupération décideurs : {}",
+                    e.getMessage());
+            return List.of();
         }
     }
 }

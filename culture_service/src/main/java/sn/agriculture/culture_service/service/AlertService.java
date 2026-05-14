@@ -9,7 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sn.agriculture.culture_service.client.UserServiceClient;
+import sn.agriculture.culture_service.dtos.response.PrevisionResponse;
 import sn.agriculture.culture_service.entity.Culture;
 import sn.agriculture.culture_service.exception.CultureException;
 import sn.agriculture.culture_service.repository.CultureRepos;
@@ -22,11 +24,12 @@ import java.util.Map;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AlertService {
 
     private final CultureRepos cultureRepos;
     private final UserServiceClient userServiceClient;
-
+    private final PrevisionService  previsionService;
     @Value("${twilio.account-sid}")
     private String accountSid;
 
@@ -148,5 +151,42 @@ public class AlertService {
         log.info(" Vérification terminée !");
     }
 
+    // ── ALERTE DÉCIDEURS ARM ──────────────────────────────
+    public void envoyerAlerteDecideurs(String message) {
+        try {
+            List<Map<String, String>> decideurs =
+                    userServiceClient.getAllDecideurs();
 
+            if (decideurs == null || decideurs.isEmpty()) {
+                log.warn("Aucun décideur trouvé !");
+                return;
+            }
+
+            decideurs.forEach(d -> {
+                String telephone = d.get("telephone");
+                if (telephone != null
+                        && !telephone.isEmpty()) {
+                    envoyerSms("+221" + telephone, message);
+                    log.info("Alerte envoyée au décideur : {}",
+                            telephone);
+                }
+            });
+        } catch (Exception e) {
+            log.error("Erreur envoi alerte décideurs : {}",
+                    e.getMessage());
+        }
+    }
+
+    // ── VÉRIFICATION MENSUELLE AUTOMATIQUE ───────────────
+    @Scheduled(cron = "0 */2 * * * *") // toutes les 2 min pour tester
+    public void verifierPrevisionsMensuelles() {
+        log.info("Vérification prévisions mensuelles...");
+
+        PrevisionResponse prevision = previsionService
+                .calculerPrevision("oignon");
+
+        envoyerAlerteDecideurs(prevision.getMessage());
+
+        log.info("Vérification terminée !");
+    }
 }

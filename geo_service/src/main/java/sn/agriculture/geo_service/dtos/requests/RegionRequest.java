@@ -14,7 +14,8 @@ import lombok.AllArgsConstructor;
 
         @NotBlank(message = "Le nom de la région est obligatoire")
         private String nomRegion;
-
+        private Double latitude;
+        private Double longitude;
         private Integer population;
         private Double superficie;
     }

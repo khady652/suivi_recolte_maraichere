@@ -11,6 +11,7 @@ import lombok.*;
         private Integer idDepartement;
         private String nomDepartement;
         private Integer idRegion;
+        private Double superficie;
         private String nomRegion;
     }
 

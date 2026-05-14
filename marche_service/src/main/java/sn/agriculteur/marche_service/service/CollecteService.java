@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sn.agriculteur.marche_service.Client.UserServiceClient;
 import sn.agriculteur.marche_service.dto.request.CollecteRequest;
 import sn.agriculteur.marche_service.dto.response.CollecteResponse;
+import sn.agriculteur.marche_service.dto.response.VariationResponse;
 import sn.agriculteur.marche_service.entity.CollecteDonnees;
 import sn.agriculteur.marche_service.entity.Marche;
 import sn.agriculteur.marche_service.exception.MarcheException;
@@ -15,6 +16,7 @@ import sn.agriculteur.marche_service.repository.MarcheRepos;
 
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -209,6 +211,79 @@ import java.util.stream.Collectors;
                     .prenomEnqueteur(prenomEnqueteur)
                     .organisation(organisation)
                     .zoneAffectation(zoneAffectation) // ✅
+                    .build();
+        }
+        public VariationResponse getVariation(
+                String produit,
+                Integer mois,
+                Integer annee) {
+
+            // Par défaut année en cours
+            int anneeRecherche = annee != null
+                    ? annee
+                    : LocalDate.now().getYear();
+
+            List<CollecteDonnees> collectes = collecteRepository
+                    .findVariationParProduit(
+                            produit, anneeRecherche, mois);
+
+            if (collectes.isEmpty())
+                return VariationResponse.builder()
+                        .produit(produit)
+                        .annee(anneeRecherche)
+                        .mois(mois)
+                        .variationPrix(List.of())
+                        .variationStock(List.of())
+                        .build();
+
+            // Variation prix
+            List<VariationResponse.PrixParDate> variationPrix =
+                    collectes.stream()
+                            .map(c -> VariationResponse.PrixParDate
+                                    .builder()
+                                    .date(c.getDateCollecte())
+                                    .prix(c.getPrixUnitaire())
+                                    .nomMarche(c.getMarche()
+                                            .getNomMarche())
+                                    .build())
+                            .collect(Collectors.toList());
+
+            // Variation stock
+            List<VariationResponse.StockParDate> variationStock =
+                    collectes.stream()
+                            .map(c -> VariationResponse.StockParDate
+                                    .builder()
+                                    .date(c.getDateCollecte())
+                                    .stock(c.getQuantiteDisponible())
+                                    .nomMarche(c.getMarche()
+                                            .getNomMarche())
+                                    .build())
+                            .collect(Collectors.toList());
+
+            // Stats prix
+            DoubleSummaryStatistics statsPrix = collectes.stream()
+                    .mapToDouble(CollecteDonnees::getPrixUnitaire)
+                    .summaryStatistics();
+
+            // Stats stock
+            DoubleSummaryStatistics statsStock = collectes.stream()
+                    .mapToDouble(CollecteDonnees::getQuantiteDisponible)
+                    .summaryStatistics();
+
+            return VariationResponse.builder()
+                    .produit(produit)
+                    .annee(anneeRecherche)
+                    .mois(mois)
+                    .prixMin(statsPrix.getMin())
+                    .prixMax(statsPrix.getMax())
+                    .prixMoyen(Math.round(
+                            statsPrix.getAverage() * 10.0) / 10.0)
+                    .stockMin(statsStock.getMin())
+                    .stockMax(statsStock.getMax())
+                    .stockMoyen(Math.round(
+                            statsStock.getAverage() * 10.0) / 10.0)
+                    .variationPrix(variationPrix)
+                    .variationStock(variationStock)
                     .build();
         }
     }

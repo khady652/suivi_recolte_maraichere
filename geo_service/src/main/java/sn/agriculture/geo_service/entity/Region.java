@@ -27,7 +27,8 @@ import java.util.List;
 
         private Integer population;
         private Double superficie;
-
+        private Double latitude;
+        private Double longitude;
         @Transient
         private Double surfaceCultivee;
 

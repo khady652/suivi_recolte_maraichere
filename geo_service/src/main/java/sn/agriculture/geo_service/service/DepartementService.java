@@ -51,6 +51,8 @@ public class DepartementService {
         departement.setNomDepartement(request.getNomDepartement());
         departement.setPopulation(request.getPopulation());
         departement.setSuperficie(request.getSuperficie());
+        departement.setLatitude(request.getLatitude());
+        departement.setLongitude(request.getLongitude());
         departement.setRegion(region);
 
         departementRepository.save(departement);
@@ -162,7 +164,8 @@ public class DepartementService {
         response.setPopulation(d.getPopulation());
         response.setSuperficie(d.getSuperficie());
         response.setNomRegion(d.getRegion().getNomRegion());
-
+        response.setLatitude(d.getLatitude());
+        response.setLongitude(d.getLongitude());
         // ✅ surfaceCultivee SEULEMENT pour Directeur SDDR
         if (avecSurface) {
             Double surface = cultureServiceClient

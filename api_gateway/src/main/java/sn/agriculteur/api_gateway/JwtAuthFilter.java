@@ -36,6 +36,7 @@ import java.util.List;
                 "/api/culture/parcelles/region",
                 "/actuator/health",
                 "/api/auth/internal",
+                "/api/public",
 
                 // Swagger
                 "/swagger-ui.html",

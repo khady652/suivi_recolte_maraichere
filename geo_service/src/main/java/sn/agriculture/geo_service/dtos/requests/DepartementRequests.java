@@ -13,7 +13,8 @@ import lombok.AllArgsConstructor;
 
         @NotBlank(message = "Le nom du département est obligatoire")
         private String nomDepartement;
-
+        private Double latitude;
+        private Double longitude;
         private Integer population;
         private Double superficie;
 

@@ -40,7 +40,8 @@ public class RegionService {
         region.setNomRegion(request.getNomRegion());
         region.setPopulation(request.getPopulation());
         region.setSuperficie(request.getSuperficie());
-
+        region.setLatitude(request.getLatitude());
+        region.setLongitude(request.getLongitude());
         regionRepository.save(region);
         log.info("Région créée : {}", request.getNomRegion());
 
@@ -132,7 +133,8 @@ public class RegionService {
         response.setNomRegion(r.getNomRegion());
         response.setPopulation(r.getPopulation());
         response.setSuperficie(r.getSuperficie());
-
+        response.setLatitude(r.getLatitude());
+        response.setLongitude(r.getLongitude());
         // ✅ surfaceCultivee SEULEMENT pour Directeur DR
         if (avecSurface) {
             Double surface = cultureServiceClient

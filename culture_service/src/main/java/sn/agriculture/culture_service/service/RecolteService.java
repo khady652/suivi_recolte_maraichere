@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
         private final CultureRepos cultureRepository;
         private final ParcelleRepos parcelleRepository;
         // ── ENREGISTRER UNE RÉCOLTE ───────────────────────────
-        // ── ENREGISTRER UNE RÉCOLTE ───────────────────────────
+
         @Transactional
         public RecolteResponse enregistrer(RecolteRequest request,
                                            Long userId, String role) {

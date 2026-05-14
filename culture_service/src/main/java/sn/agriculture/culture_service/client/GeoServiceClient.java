@@ -6,6 +6,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import sn.agriculture.culture_service.util.DepartementResponse;
+import sn.agriculture.culture_service.util.RegionResponse;
 import sn.agriculture.culture_service.util.ServiceRegionalResponse;
 import sn.agriculture.culture_service.util.ServiceRegionalResponse;
 
@@ -93,6 +94,30 @@ public class GeoServiceClient {
             log.error("Erreur récupération région par service {} : {}",
                     idServiceRegional, e.getMessage());
             return null;
+        }
+    }
+    public RegionResponse getRegionById(Integer id) {
+        try {
+            return restClient.get()
+                    .uri("/api/geo/regions/{id}", id)
+                    .retrieve()
+                    .body(RegionResponse.class);
+        } catch (Exception e) {
+            log.error("Erreur récupération région {} : {}",
+                    id, e.getMessage());
+            return null;
+        }
+    }
+    public List<DepartementResponse> getAllDepartements() {
+        try {
+            return restClient.get()
+                    .uri("/api/geo/departements")
+                    .retrieve()
+                    .body(new ParameterizedTypeReference<List<DepartementResponse>>() {});
+                     } catch (Exception e) {
+            log.error("Erreur récupération départements : {}",
+                    e.getMessage());
+            return List.of();
         }
     }
 }

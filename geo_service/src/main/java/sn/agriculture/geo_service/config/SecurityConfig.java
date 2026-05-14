@@ -34,7 +34,11 @@ public class SecurityConfig {
                                 "/v3/api-docs.yaml",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/webjars/**"
+                                "/webjars/**",
+                                "/api/geo/regions",
+                                "/api/geo/regions/**",
+                                "/api/geo/departements",
+                                "/api/geo/departements/**"
                         ).permitAll()
 
                         // ── Actuator + Error ──────────────────────────

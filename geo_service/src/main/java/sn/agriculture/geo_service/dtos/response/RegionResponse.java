@@ -14,5 +14,7 @@ import lombok.AllArgsConstructor;
         private Double superficie;
         private Double surfaceCultivee;
         private String nomServiceRegionale;
+        private Double latitude;
+        private Double longitude;
     }
 

@@ -34,7 +34,8 @@ import java.util.List;
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "id_region", nullable = false)
         private Region region;
-
+        private Double latitude;
+        private Double longitude;
         @OneToOne(mappedBy = "departement", cascade = CascadeType.ALL)
         private ServiceDepartementale serviceDepartementale;
 

@@ -1,6 +1,7 @@
 package sn.agriculteur.marche_service.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import sn.agriculteur.marche_service.entity.CollecteDonnees;
 
@@ -49,5 +50,15 @@ import java.util.List;
                 "  AND c2.marche = c.marche" +        // ← par produit ET par marché
                 ")")
         List<CollecteDonnees> derniersPrixParProduitEtMarche();
+        // Variation prix par mois
+        @Query("SELECT c FROM CollecteDonnees c " +
+                "WHERE LOWER(c.produit) = LOWER(:produit) " +
+                "AND YEAR(c.dateCollecte) = :annee " +
+                "AND (:mois IS NULL OR MONTH(c.dateCollecte) = :mois) " +
+                "ORDER BY c.dateCollecte ASC")
+        List<CollecteDonnees> findVariationParProduit(
+                @Param("produit") String produit,
+                @Param("annee") int annee,
+                @Param("mois") Integer mois);
     }
 

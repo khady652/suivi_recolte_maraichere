@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import sn.agriculteur.marche_service.dto.request.CollecteRequest;
 import sn.agriculteur.marche_service.dto.response.CollecteResponse;
+import sn.agriculteur.marche_service.dto.response.VariationResponse;
 import sn.agriculteur.marche_service.service.CollecteService;
 
 import java.util.List;
@@ -104,6 +105,16 @@ import java.util.Map;
         public ResponseEntity<List<CollecteResponse>> getDerniersPrix() {
             return ResponseEntity.ok(
                     collecteService.getDerniersPrix());
+        }
+        // ── VARIATION PRIX ET STOCK ───────────────────────────
+        @GetMapping("/stats/variation")
+        public ResponseEntity<VariationResponse> getVariation(
+                @RequestParam String produit,
+                @RequestParam(required = false) Integer mois,
+                @RequestParam(required = false) Integer annee) {
+            return ResponseEntity.ok(
+                    collecteService.getVariation(
+                            produit, mois, annee));
         }
     }
 

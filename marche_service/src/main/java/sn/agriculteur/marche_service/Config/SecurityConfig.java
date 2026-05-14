@@ -47,7 +47,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
                                     "/api/marche/collectes/derniers-prix",
                                     "/api/marche/collectes/stats/prix-moyen",
                                     "/api/marche/collectes/stats/stock-du-jour",
-                                    "/api/marche/collectes/produit/**"
+                                    "/api/marche/collectes/produit/**",
+                                    "/api/marche/collectes/stats/**"
                             ).permitAll()
 
                             // ── ENQUÊTEUR → enregistrer / éditer collectes ─
@@ -67,7 +68,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
                             .requestMatchers(HttpMethod.POST,
                                     "/api/marche/marches"
                             ).hasRole("DECIDEUR_ARM")
-
+                            .requestMatchers(HttpMethod.GET,
+                                    "/api/marche/stock-alert/**"
+                            ).hasRole("DECIDEUR_ARM")
                             .requestMatchers(HttpMethod.PUT,
                                     "/api/marche/marches/**"
                             ).hasRole("DECIDEUR_ARM")
@@ -83,6 +86,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
                                     "/api/marche/collectes/marche/**"
                             ).hasAnyRole("DECIDEUR_ARM",
                                     "ENQUETEUR_MARCHE")
+                            .requestMatchers(HttpMethod.PATCH,
+                                    "/api/marche/collectes/*/stock"
+                            ).hasRole("ENQUETEUR_MARCHE")
 
                             // ── AGRICULTEUR + CHEF COOP → alertes prix ─────
                             .requestMatchers(HttpMethod.GET,

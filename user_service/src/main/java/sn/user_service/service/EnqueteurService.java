@@ -14,6 +14,7 @@ import sn.user_service.repository.EnqueteurRepo;
 import sn.user_service.repository.UtilisateurRepository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,7 +24,7 @@ public class EnqueteurService {
 
     private final EnqueteurRepo enqueteurRepository;
     private final UtilisateurRepository utilisateurRepository;
-    private final AuthServiceClient authServiceClient; // ✅ Ajout
+    private final AuthServiceClient authServiceClient;
 
     // ── CRÉER ─────────────────────────────────────────────
     @Transactional
@@ -80,7 +81,7 @@ public class EnqueteurService {
         return toResponse(enqueteur);
     }
 
-    // ── MODIFIER ──────────────────────────────────────────
+    //  MODIFIER
     @Transactional
     public MessageResponse update(
             Integer id, EnqueteurRequest request) {
@@ -108,7 +109,7 @@ public class EnqueteurService {
                 "Enquêteur modifié avec succès", true);
     }
 
-    // ── SUPPRIMER ─────────────────────────────────────────
+    // SUPPRIMER
     @Transactional
     public MessageResponse delete(Integer id) {
         EnqueteurMarche enqueteur = enqueteurRepository
@@ -120,7 +121,7 @@ public class EnqueteurService {
                 "Enquêteur supprimé avec succès", true);
     }
 
-    // ── MÉTHODE UTILITAIRE ────────────────────────────────
+    // MÉTHODE UTILITAIRE
     private EnqueteurResponse toResponse(EnqueteurMarche e) {
         EnqueteurResponse response = new EnqueteurResponse();
         response.setIdUtilisateur(e.getIdUtilisateur());
@@ -140,5 +141,22 @@ public class EnqueteurService {
                 .orElseThrow(() ->
                         new UserException("Profil introuvable"));
         return toResponse(enqueteur);
+    }
+    public Map<String, String> getInfo(Integer id) {
+        EnqueteurMarche enqueteur = enqueteurRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new UserException("Enquêteur introuvable"));
+
+        return Map.of(
+                "nom", enqueteur.getNom() != null
+                        ? enqueteur.getNom() : "",
+                "prenom", enqueteur.getPrenom() != null
+                        ? enqueteur.getPrenom() : "",
+                "organisation", enqueteur.getOrganisation() != null
+                        ? enqueteur.getOrganisation() : "",
+                "zoneAffectation", enqueteur.getZoneAffectation() != null
+                        ? enqueteur.getZoneAffectation() : ""
+        );
     }
 }

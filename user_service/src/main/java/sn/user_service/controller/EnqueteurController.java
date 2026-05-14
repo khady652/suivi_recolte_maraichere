@@ -13,6 +13,7 @@ import sn.user_service.dto.Responses.MessageResponse;
 import sn.user_service.service.EnqueteurService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users/enqueteurs")
@@ -69,6 +70,12 @@ public class EnqueteurController {
         return ResponseEntity.ok(
                 enqueteurService.getMonProfil(userId));
     }
-
+    // GET /api/users/enqueteurs/{id}/info
+    @GetMapping("/{id}/info")
+    public ResponseEntity<Map<String, String>> getInfo(
+            @PathVariable Integer id) {
+        return ResponseEntity.ok(
+                enqueteurService.getInfo(id));
+    }
 }
 

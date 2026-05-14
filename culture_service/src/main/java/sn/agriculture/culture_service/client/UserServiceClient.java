@@ -115,4 +115,16 @@ public class UserServiceClient {
             return null;
         }
     }
+    public List<Map<String, String>> getAllDecideurs() {
+        try {
+            return restClient.get()
+                    .uri("/api/users/decideurs")
+                    .retrieve()
+                    .body(new ParameterizedTypeReference<List<Map<String, String>>>() {});
+        } catch (Exception e) {
+            log.error("Erreur récupération décideurs : {}",
+                    e.getMessage());
+            return List.of();
+        }
+    }
 }

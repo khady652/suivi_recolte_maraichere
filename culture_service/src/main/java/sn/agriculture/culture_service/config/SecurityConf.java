@@ -28,19 +28,22 @@ public class SecurityConf {
                                 SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
 
-                        // ── Swagger ───────────────────────────────────
+                        //  Swagger
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/webjars/**"
+                                "/webjars/**",
+                                "/api/culture/productions/par-region",
+                                "/api/culture/productions/par-annee",
+                                "/api/culture/productions/region/*/surface-cultivee"
                         ).permitAll()
 
-                        // ── Actuator + Error ──────────────────────────
+                        // Actuator + Error
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/error").permitAll()
 
-                        // ── PARCELLES ─────────────────────────────────
+                        // PARCELLES
                         .requestMatchers(HttpMethod.GET,
                                 "/api/culture/parcelles/mes-parcelles"
                         ).hasRole("AGRICULTEUR")
@@ -59,7 +62,7 @@ public class SecurityConf {
 
                         .requestMatchers(HttpMethod.GET,
                                 "/api/culture/parcelles/toutes"
-                        ).hasAnyRole("ADMINISTRATEUR", "DECIDEUR_ARM")
+                        ).hasAnyRole("ADMINISTRATEUR")
 
                         .requestMatchers(HttpMethod.POST,
                                 "/api/culture/parcelles"
@@ -76,7 +79,7 @@ public class SecurityConf {
                         ).hasAnyRole("AGRICULTEUR", "DIRECTEUR_SDDR",
                                 "ADMINISTRATEUR")
 
-                        // ── CULTURES ──────────────────────────────────
+                        // CULTURES
                         .requestMatchers(HttpMethod.GET,
                                 "/api/culture/cultures/mes-cultures"
                         ).hasRole("AGRICULTEUR")
@@ -116,7 +119,7 @@ public class SecurityConf {
                         ).hasAnyRole("AGRICULTEUR", "DIRECTEUR_SDDR",
                                 "ADMINISTRATEUR")
 
-                        // ── RÉCOLTES ──────────────────────────────────
+                        //  RÉCOLTES
                         .requestMatchers(HttpMethod.GET,
                                 "/api/culture/recoltes/mes-recoltes"
                         ).hasRole("AGRICULTEUR")
@@ -146,13 +149,13 @@ public class SecurityConf {
                                 "/api/culture/recoltes/**"
                         ).hasRole("ADMINISTRATEUR")
 
-                        // ── STATISTIQUES RÉCOLTES ─────────────────────
+                        //  STATISTIQUES RÉCOLTES
                         .requestMatchers(HttpMethod.GET,
                                 "/api/culture/recoltes/stats/**"
                         ).hasAnyRole("DECIDEUR_ARM", "DIRECTEUR_DR",
                                 "DIRECTEUR_SDDR")
 
-                        // ── PRODUCTIONS ───────────────────────────────
+                        //  PRODUCTIONS
                         .requestMatchers(HttpMethod.GET,
                                 "/api/culture/productions/tableau-de-bord",
                                 "/api/culture/productions/par-region",
@@ -176,7 +179,27 @@ public class SecurityConf {
                                 "/api/culture/productions/departement/*/surface-cultivee",
                                 "/api/culture/productions/region/*/surface-cultivee"
                         ).permitAll()
-                        // ── Tout le reste → authentifié ───────────────
+
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/culture/rapports/mon-departement",
+                                "/api/culture/rapports/mon-departement/pdf"
+                        ).hasRole("DIRECTEUR_SDDR")
+
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/culture/rapports/ma-region",
+                                "/api/culture/rapports/ma-region/pdf"
+                        ).hasRole("DIRECTEUR_DR")
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/culture/rapports/national",
+                                "/api/culture/rapports/national/pdf"
+                        ).hasRole("DECIDEUR_ARM")
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/culture/previsions/**"
+                        ).hasRole("DECIDEUR_ARM")
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/culture/previsions/test-sms"
+                        ).permitAll()
+                        // Tout le reste → authentifié
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter,
