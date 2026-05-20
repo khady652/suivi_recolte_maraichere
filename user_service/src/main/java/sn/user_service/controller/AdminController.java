@@ -18,7 +18,7 @@ import java.util.List;
     @RequestMapping("/api/users/administrateurs")
     @RequiredArgsConstructor
     @Slf4j
-    @CrossOrigin(origins = "*")
+    //  @CrossOrigin(origins = "*")
     public class AdminController {
 
         private final AdminService administrateurService;

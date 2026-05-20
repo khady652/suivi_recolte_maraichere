@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import sn.user_service.entity.Agriculteur;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AgriculteurRepo extends JpaRepository<Agriculteur, Integer> {
@@ -14,6 +15,6 @@ public interface AgriculteurRepo extends JpaRepository<Agriculteur, Integer> {
 
     // Trouver les agriculteurs sans coopérative
     List<Agriculteur> findByCooperativeIsNull();
-
+    Optional<Agriculteur> findByIdUtilisateur(Integer idUtilisateur);
 
 }

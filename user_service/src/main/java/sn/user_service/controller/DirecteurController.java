@@ -21,7 +21,7 @@ import java.util.Map;
     @RequestMapping("/api/users/directeurs")
     @RequiredArgsConstructor
     @Slf4j
-    @CrossOrigin(origins = "*")
+// @CrossOrigin(origins = "*")
     public class DirecteurController {
 
         private final DirecteurService directeurService;

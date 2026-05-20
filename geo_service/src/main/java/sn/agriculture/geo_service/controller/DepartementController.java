@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("/api/geo/departements")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 public class DepartementController {
 
     private final DepartementService departementService;

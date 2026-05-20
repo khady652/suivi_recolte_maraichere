@@ -101,7 +101,7 @@ import java.util.stream.Collectors;
                 Integer id, ChefCooperatifRequest request) {
 
             ChefCooperatif chef = chefCooperatifRepository
-                    .findById(id)
+                    .findByIdUtilisateur(id)
                     .orElseThrow(() ->
                             new UserException("Chef coopératif introuvable"));
 
@@ -120,7 +120,7 @@ import java.util.stream.Collectors;
                                 new UserException("Coopérative introuvable"));
                 chef.setCooperative(cooperative);
             }
-
+            chef.setEmail(chef.getEmail());
             chefCooperatifRepository.save(chef);
             return new MessageResponse(
                     "Chef coopératif modifié avec succès", true);
@@ -130,7 +130,7 @@ import java.util.stream.Collectors;
         @Transactional
         public MessageResponse delete(Integer id) {
             ChefCooperatif chef = chefCooperatifRepository
-                    .findById(id)
+                    .findByIdUtilisateur(id)
                     .orElseThrow(() ->
                             new UserException("Chef coopératif introuvable"));
             chefCooperatifRepository.delete(chef);
@@ -150,6 +150,7 @@ import java.util.stream.Collectors;
             if (c.getCooperative() != null) {
                 response.setNomCooperative(
                         c.getCooperative().getNomCooperative());
+                response.setIdCooperative(c.getCooperative().getIdCooperation());
             }
             return response;
         }

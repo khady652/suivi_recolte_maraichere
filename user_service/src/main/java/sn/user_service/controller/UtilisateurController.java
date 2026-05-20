@@ -6,6 +6,7 @@ package sn.user_service.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import sn.user_service.dto.Responses.MessageResponse;
 import sn.user_service.dto.Responses.UtilisateurResponse;
@@ -17,7 +18,7 @@ import java.util.List;
     @RequestMapping("/api/users/admin")
     @RequiredArgsConstructor
     @Slf4j
-    @CrossOrigin(origins = "*")
+    // @CrossOrigin(origins = "*")
     public class UtilisateurController {
 
         private final UtilisateurService utilisateurService;
@@ -43,6 +44,16 @@ import java.util.List;
         public ResponseEntity<List<UtilisateurResponse>> getAll() {
             return ResponseEntity.ok(
                     utilisateurService.getAll());
+        }
+
+
+        // GET /api/users/admin/mon-profil
+        @GetMapping("/mon-profil")
+        public ResponseEntity<UtilisateurResponse> getMonProfil(
+                Authentication authentication) {
+            Integer userId = (Integer) authentication.getPrincipal();
+            return ResponseEntity.ok(
+                    utilisateurService.getMonProfil(userId));
         }
     }
 

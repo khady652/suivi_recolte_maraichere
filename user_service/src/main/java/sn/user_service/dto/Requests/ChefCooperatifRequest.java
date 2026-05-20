@@ -34,7 +34,7 @@ import lombok.NoArgsConstructor;
         )
         private String telephone;
 
-        @NotNull(message = "La coopérative est obligatoire")
+
         private Integer idCooperative;
     }
 

@@ -18,7 +18,7 @@ import java.util.Map;
     @RequestMapping("/api/geo/services-departementaux")
     @RequiredArgsConstructor
     @Slf4j
-    @CrossOrigin(origins = "*")
+    //@CrossOrigin(origins = "*")
     public class ServiceDepartementalController {
 
     private final ServiceDepartementaleService serviceDepartementaleService;

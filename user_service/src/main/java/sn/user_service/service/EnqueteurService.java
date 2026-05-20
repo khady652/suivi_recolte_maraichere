@@ -87,7 +87,7 @@ public class EnqueteurService {
             Integer id, EnqueteurRequest request) {
 
         EnqueteurMarche enqueteur = enqueteurRepository
-                .findById(id)
+                .findByIdUtilisateur(id)
                 .orElseThrow(() ->
                         new UserException("Enquêteur introuvable"));
 
@@ -113,7 +113,7 @@ public class EnqueteurService {
     @Transactional
     public MessageResponse delete(Integer id) {
         EnqueteurMarche enqueteur = enqueteurRepository
-                .findById(id)
+                .findByIdUtilisateur(id)
                 .orElseThrow(() ->
                         new UserException("Enquêteur introuvable"));
         enqueteurRepository.delete(enqueteur);

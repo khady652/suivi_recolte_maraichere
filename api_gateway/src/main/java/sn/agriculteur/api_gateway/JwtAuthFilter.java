@@ -30,7 +30,7 @@ import java.util.List;
                 "/api/auth/forgot-password",
                 "/api/auth/reset-password",
                 "/api/auth/health",
-                "/api/users/agriculteurs",
+                //"/api/users/agriculteurs",
                 "/api/users/cooperatives",
                 "/api/culture/parcelles/departement",
                 "/api/culture/parcelles/region",
@@ -115,9 +115,7 @@ import java.util.List;
         private boolean isPublicRoute(String path) {
             return publicRoutes.stream()
                     .anyMatch(route -> path.equals(route) ||
-                            path.startsWith(route + "/") &&
-                                    !path.contains("mon-profil") &&
-                                    !path.contains("mes-agriculteurs"));
+                            path.startsWith(route + "/"));
         }
 
         private Claims extractAllClaims(String token) {

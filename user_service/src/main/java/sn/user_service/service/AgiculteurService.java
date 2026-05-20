@@ -98,10 +98,10 @@ import java.util.stream.Collectors;
         // ── MODIFIER ──────────────────────────────────────────
         @Transactional
         public MessageResponse update(
-                Integer id, AgriculteurRequest request) {
+                Integer idUtilisateur, AgriculteurRequest request) {
 
             Agriculteur agriculteur = agriculteurRepository
-                    .findById(id)
+                    .findByIdUtilisateur(idUtilisateur)
                     .orElseThrow(() ->
                             new UserException("Agriculteur introuvable"));
 
@@ -133,9 +133,9 @@ import java.util.stream.Collectors;
 
         // ── SUPPRIMER ─────────────────────────────────────────
         @Transactional
-        public MessageResponse delete(Integer id) {
+        public MessageResponse delete(Integer idUtilisateur) {
             Agriculteur agriculteur = agriculteurRepository
-                    .findById(id)
+                    .findByIdUtilisateur(idUtilisateur)
                     .orElseThrow(() ->
                             new UserException("Agriculteur introuvable"));
             agriculteurRepository.delete(agriculteur);

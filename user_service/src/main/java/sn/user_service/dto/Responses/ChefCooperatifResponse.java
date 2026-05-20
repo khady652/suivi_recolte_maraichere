@@ -15,5 +15,6 @@ import lombok.NoArgsConstructor;
         private String telephone;
         private Boolean actif;
         private String nomCooperative;
+        private Integer idCooperative;
     }
 

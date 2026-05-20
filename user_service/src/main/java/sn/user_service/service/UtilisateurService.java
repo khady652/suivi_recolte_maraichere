@@ -6,10 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 import sn.user_service.Client.AuthServiceClient;
 import sn.user_service.dto.Responses.MessageResponse;
 import sn.user_service.dto.Responses.UtilisateurResponse;
-import sn.user_service.entity.Utilisateur;
+import sn.user_service.entity.*;
 import sn.user_service.exception.UserException;
 import sn.user_service.repository.UtilisateurRepository;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,6 +67,18 @@ import java.util.stream.Collectors;
         }
 
         // ── MÉTHODE UTILITAIRE ────────────────────────────────
+        /*private UtilisateurResponse toResponse(Utilisateur u) {
+            UtilisateurResponse response = new UtilisateurResponse();
+            response.setIdUtilisateur(u.getIdUtilisateur());
+            response.setNom(u.getNom());
+            response.setPrenom(u.getPrenom());
+            response.setEmail(u.getEmail());
+            response.setTelephone(u.getTelephone());
+            response.setRole(u.getRole());
+            response.setActif(u.getActif());
+            response.setAdresse(u.getAdresse());
+            return response;
+        }*/
         private UtilisateurResponse toResponse(Utilisateur u) {
             UtilisateurResponse response = new UtilisateurResponse();
             response.setIdUtilisateur(u.getIdUtilisateur());
@@ -75,7 +88,47 @@ import java.util.stream.Collectors;
             response.setTelephone(u.getTelephone());
             response.setRole(u.getRole());
             response.setActif(u.getActif());
+            response.setAdresse(u.getAdresse());
+
+            // ✅ Champs spécifiques selon le rôle
+            if (u instanceof Agriculteur a) {
+                response.setAnneeExperience(a.getAnneeExperience());
+                response.setNiveauInstruction(a.getNiveauInstruction());
+                if (a.getCooperative() != null)
+                    response.setNomCooperative(a.getCooperative().getNomCooperative());
+            }
+            if (u instanceof ChefCooperatif c) {
+                if (c.getCooperative() != null) {
+                    response.setNomCooperative(c.getCooperative().getNomCooperative());
+                    response.setIdCooperative(c.getCooperative().getIdCooperation());
+                }
+            }
+            if (u instanceof EnqueteurMarche e) {
+                response.setOrganisation(e.getOrganisation());
+                response.setZoneAffectation(e.getZoneAffectation());
+            }
+            if (u instanceof DirecteurSDDR d) {
+                response.setSpecialite(d.getSpecialite());
+            }
+            if (u instanceof DirecteurDRDR d) {
+                response.setSpecialite(d.getSpecialite());
+            }
+            if (u.getCreatedAt() != null) {
+                response.setDateCreation(
+                        u.getCreatedAt().format(
+                                DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                        )
+                );
+            }
             return response;
+        }
+        // ── MON PROFIL ────────────────────────────────────────
+        public UtilisateurResponse getMonProfil(Integer userId) {
+            Utilisateur utilisateur = utilisateurRepository
+                    .findById(userId)
+                    .orElseThrow(() ->
+                            new UserException("Profil introuvable"));
+            return toResponse(utilisateur);
         }
     }
 

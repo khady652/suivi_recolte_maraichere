@@ -22,7 +22,7 @@ import java.util.Map;
     @RequestMapping("/api/users/agriculteurs")
     @RequiredArgsConstructor
     @Slf4j
-    @CrossOrigin(origins = "*")
+//  @CrossOrigin(origins = "*")
     public class AgriculteurControler {
 
         private final AgiculteurService agriculteurService;

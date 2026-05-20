@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping("/api/users/cooperatives")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*")
+// @CrossOrigin(origins = "*")
 public class CooperativeController {
 
     private final CooperatifService cooperativeService;

@@ -14,7 +14,7 @@ import sn.agriculture.auth_service.service.AuthService;
     @RequestMapping("/api/auth")
     @RequiredArgsConstructor
     @Slf4j
-    @CrossOrigin(origins = "*")
+    //@CrossOrigin(origins = "*")
     public class AuthController {
 
         private final AuthService authService;

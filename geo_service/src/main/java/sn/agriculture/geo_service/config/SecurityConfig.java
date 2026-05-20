@@ -38,7 +38,9 @@ public class SecurityConfig {
                                 "/api/geo/regions",
                                 "/api/geo/regions/**",
                                 "/api/geo/departements",
-                                "/api/geo/departements/**"
+                                "/api/geo/departements/**",
+                                "/api/geo/services-regionaux/*/affecter-directeur",
+                                "/api/geo/services-departementaux/*/affecter-directeur"
                         ).permitAll()
 
                         // ── Actuator + Error ──────────────────────────
@@ -57,7 +59,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH,
                                 "/api/geo/services-regionaux/*/affecter-directeur",
                                 "/api/geo/services-departementaux/*/affecter-directeur"
-                        ).hasRole("ADMINISTRATEUR")
+                        ).permitAll()
 
                         // ── DIRECTEUR SDDR → son département ──────────
                         .requestMatchers(HttpMethod.GET,

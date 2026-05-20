@@ -19,7 +19,7 @@ import java.util.List;
     @RequestMapping("/api/users/chefs-cooperatifs")
     @RequiredArgsConstructor
     @Slf4j
-    @CrossOrigin(origins = "*")
+    //  @CrossOrigin(origins = "*")
     public class ChefCooperatifController {
 
         private final ChefCooperativeService chefCooperatifService;

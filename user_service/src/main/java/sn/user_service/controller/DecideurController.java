@@ -18,7 +18,7 @@ import java.util.List;
     @RequestMapping("/api/users/decideurs")
     @RequiredArgsConstructor
     @Slf4j
-    @CrossOrigin(origins = "*")
+    // @CrossOrigin(origins = "*")
     public class DecideurController {
 
         private final DecideurService decideurARMService;

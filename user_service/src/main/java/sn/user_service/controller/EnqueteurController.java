@@ -19,7 +19,7 @@ import java.util.Map;
 @RequestMapping("/api/users/enqueteurs")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*")
+// @CrossOrigin(origins = "*")
 public class EnqueteurController {
 
     private final EnqueteurService enqueteurService;

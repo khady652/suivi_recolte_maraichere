@@ -109,7 +109,7 @@ public class DirecteurService {
             Integer id, DirecteurRequest request) {
 
         DirecteurDRDR directeur = directeurDRRepository
-                .findById(id)
+                .findByIdUtilisateur(id)
                 .orElseThrow(() ->
                         new UserException("Directeur DR introuvable"));
 
@@ -139,7 +139,7 @@ public class DirecteurService {
     @Transactional
     public MessageResponse deleteDR(Integer id) {
         DirecteurDRDR directeur = directeurDRRepository
-                .findById(id)
+                .findByIdUtilisateur(id)
                 .orElseThrow(() ->
                         new UserException("Directeur DR introuvable"));
         directeurDRRepository.delete(directeur);
@@ -247,7 +247,7 @@ public class DirecteurService {
                     request.getIdServiceDepartementale(),
                     directeur.getIdUtilisateur());
         }
-
+         directeur.setEmail(directeur.getEmail());
         directeurSDDRRepository.save(directeur);
         return new MessageResponse(
                 "Directeur SDDR modifié avec succès", true);

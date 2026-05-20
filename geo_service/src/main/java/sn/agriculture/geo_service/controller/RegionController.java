@@ -19,7 +19,7 @@ import java.util.List;
     @RequestMapping("/api/geo/regions")
     @RequiredArgsConstructor
     @Slf4j
-    @CrossOrigin(origins = "*")
+    //@CrossOrigin(origins = "*")
     public class RegionController {
 
         private final RegionService regionService;

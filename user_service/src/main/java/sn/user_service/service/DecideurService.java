@@ -84,7 +84,7 @@ public class DecideurService {
             Integer id, DecideurRequest request) {
 
         DecideurARM decideur = decideurARMRepository
-                .findById(id)
+                .findByIdUtilisateur(id)
                 .orElseThrow(() ->
                         new UserException("Décideur ARM introuvable"));
 
@@ -96,7 +96,7 @@ public class DecideurService {
             decideur.setAdresse(request.getAdresse());
         if (request.getTelephone() != null)
             decideur.setTelephone(request.getTelephone());
-
+            decideur.setEmail(decideur.getEmail());
         decideurARMRepository.save(decideur);
         return new MessageResponse(
                 "Décideur ARM modifié avec succès", true);
@@ -106,7 +106,7 @@ public class DecideurService {
     @Transactional
     public MessageResponse delete(Integer id) {
         DecideurARM decideur = decideurARMRepository
-                .findById(id)
+                .findByIdUtilisateur(id)
                 .orElseThrow(() ->
                         new UserException("Décideur ARM introuvable"));
         decideurARMRepository.delete(decideur);

@@ -39,7 +39,7 @@ public class SecurityConfig {
                         // ── Actuator ──────────────────────────────────
                         .requestMatchers("/actuator/health").permitAll()
 
-                        // ── Endpoints internes AVANT hasRole ✅ ───────
+                        // ── Endpoints internes (autres microservices) ─
                         .requestMatchers(HttpMethod.GET,
                                 "/api/users/agriculteurs/*/info",
                                 "/api/users/agriculteurs/*/chef-info",
@@ -52,34 +52,72 @@ public class SecurityConfig {
                         // ── ROUTES PUBLIQUES ──────────────────────────
                         .requestMatchers(HttpMethod.GET,
                                 "/api/users/cooperatives",
-                                "/api/users/cooperatives/**",
-                                "/api/users/agriculteurs",
-                                "/api/users/agriculteurs/**"
+                                "/api/users/cooperatives/**"
                         ).permitAll()
 
-                        // ── ADMINISTRATEUR ────────────────────────────
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/users/cooperatives",
+                        // ── ADMIN — GET ───────────────────────────────
+                        .requestMatchers(HttpMethod.GET,
                                 "/api/users/administrateurs",
-                                "/api/users/directeurs/**",
+                                "/api/users/administrateurs/**",
                                 "/api/users/enqueteurs",
+                                "/api/users/enqueteurs/**",
+                                "/api/users/decideurs/**",
+                                "/api/users/directeurs/dr/**",
+                                "/api/users/directeurs/sddr/**",
+                                "/api/users/chefs-cooperatifs",
+                                "/api/users/chefs-cooperatifs/**",
+                                "/api/users/agriculteurs",
+                                "/api/users/agriculteurs/**"
+                        ).hasRole("ADMINISTRATEUR")
+
+                        // ── ADMIN — POST ──────────────────────────────
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/users/administrateurs",
                                 "/api/users/decideurs",
+                                "/api/users/directeurs/**",
                                 "/api/users/chefs-cooperatifs"
                         ).hasRole("ADMINISTRATEUR")
 
+                        // ── ADMIN + CHEF COOP — POST agriculteur ──────
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/users/agriculteurs"
+                        ).hasAnyRole("ADMINISTRATEUR", "CHEF_COOPERATIF")
+
+                        // ── ADMIN + DIRECTEUR SDDR — POST enquêteur ───
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/users/enqueteurs"
+                        ).hasAnyRole("ADMINISTRATEUR", "DIRECTEUR_SDDR")
+
+                        // ── ADMIN — PUT ───────────────────────────────
                         .requestMatchers(HttpMethod.PUT,
-                                "/api/users/cooperatives/**",
-                                "/api/users/administrateurs/**"
+                                "/api/users/administrateurs/**",
+                                "/api/users/decideurs/**",
+                                "/api/users/directeurs/dr/**",
+                                "/api/users/directeurs/sddr/**",
+                                "/api/users/enqueteurs/**",
+                                "/api/users/chefs-cooperatifs/**"
                         ).hasRole("ADMINISTRATEUR")
 
+                        // ── ADMIN + AGRICULTEUR — PUT profil ──────────
+                        .requestMatchers(HttpMethod.PUT,
+                                "/api/users/agriculteurs/**"
+                        ).hasAnyRole("ADMINISTRATEUR", "AGRICULTEUR")
+
+                        // ── ADMIN + CHEF COOP — PUT coopératives ──────
+                        .requestMatchers(HttpMethod.PUT,
+                                "/api/users/cooperatives/**"
+                        ).hasAnyRole("ADMINISTRATEUR", "CHEF_COOPERATIF")
+
+                        // ── ADMIN — DELETE ────────────────────────────
                         .requestMatchers(HttpMethod.DELETE,
                                 "/api/users/cooperatives/**",
-                                "/api/users/administrateurs/**"
-                        ).hasRole("ADMINISTRATEUR")
-
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/users/administrateurs",
-                                "/api/users/administrateurs/**"
+                                "/api/users/administrateurs/**",
+                                "/api/users/directeurs/dr/**",
+                                "/api/users/directeurs/sddr/**",
+                                "/api/users/enqueteurs/**",
+                                "/api/users/decideurs/**",
+                                "/api/users/chefs-cooperatifs/**",
+                                "/api/users/agriculteurs/**"
                         ).hasRole("ADMINISTRATEUR")
 
                         // ── AGRICULTEUR ───────────────────────────────
@@ -103,7 +141,7 @@ public class SecurityConfig {
                                 "/api/users/directeurs/sddr/mon-profil"
                         ).hasRole("DIRECTEUR_SDDR")
 
-                        // ── ADMIN ─────────────────────────────────────
+                        // ── ADMIN endpoints ───────────────────────────
                         .requestMatchers("/api/users/admin/**")
                         .hasRole("ADMINISTRATEUR")
 
