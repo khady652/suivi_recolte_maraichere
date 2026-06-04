@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
         @JoinColumn(name = "id_cooperation")
         private Cooperative cooperative;
 
-        // Méthode métier
+
         public void gererMembres() {
             // logique de gestion des membres
         }

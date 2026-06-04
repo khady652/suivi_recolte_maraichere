@@ -31,7 +31,7 @@ import java.util.List;
                 "/api/auth/reset-password",
                 "/api/auth/health",
                 //"/api/users/agriculteurs",
-                "/api/users/cooperatives",
+                //"/api/users/cooperatives",
                 "/api/culture/parcelles/departement",
                 "/api/culture/parcelles/region",
                 "/actuator/health",

@@ -18,7 +18,6 @@ import java.util.List;
 @RequestMapping("/api/culture/parcelles")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*")
 public class ParcelleController {
 
     private final ParcelleService parcelleService;

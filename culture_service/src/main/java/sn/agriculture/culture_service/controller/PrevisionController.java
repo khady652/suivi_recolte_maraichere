@@ -15,7 +15,7 @@ import sn.agriculture.culture_service.service.PrevisionService;
     @RequestMapping("/api/culture/previsions")
     @RequiredArgsConstructor
     @Slf4j
-    @CrossOrigin(origins = "*")
+
     public class PrevisionController {
 
         private final PrevisionService previsionService;

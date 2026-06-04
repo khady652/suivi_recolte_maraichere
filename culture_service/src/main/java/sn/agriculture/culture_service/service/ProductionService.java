@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sn.agriculture.culture_service.client.GeoServiceClient;
 import sn.agriculture.culture_service.client.UserServiceClient;
 import sn.agriculture.culture_service.dtos.response.HistoriqueCultureResponse;
+import sn.agriculture.culture_service.dtos.response.ProductionMensuelReponse;
 import sn.agriculture.culture_service.entity.Culture;
 import sn.agriculture.culture_service.entity.Recolte;
 import sn.agriculture.culture_service.repository.CultureRepos;
@@ -309,10 +310,10 @@ public class ProductionService {
                         String statut = calculerStatut(
                                 c, aujourd_hui);
                         switch (statut) {
-                            case "EN_COURS"  -> enCours++;
-                            case "PRETE"     -> prete++;
+                            case "EN_COURS" -> enCours++;
+                            case "PRETE" -> prete++;
                             case "EN_RETARD" -> enRetard++;
-                            case "RECOLTEE"  -> recoltee++;
+                            case "RECOLTEE" -> recoltee++;
                             case "PLANIFIEE" -> planifiee++;
                         }
                         totalAvancement += calculerAvancement(
@@ -380,6 +381,7 @@ public class ProductionService {
         return Math.min(100,
                 (joursEcoules * 100.0) / totalJours);
     }
+
     // ── TABLEAU DE BORD CHEF COOPERATIF ──────────────────
     @Transactional
     public ProductionReponse getTableauDeBordCooperative(
@@ -459,6 +461,7 @@ public class ProductionService {
 
         return buildAvancement(byAgriculteur, aujourd_hui);
     }
+
     public HistoriqueCultureResponse getSurfaceAnneeCourante(
             List<Long> idDepartements,
             String nomTerritoire,
@@ -490,5 +493,103 @@ public class ProductionService {
 
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    // ── PRODUCTION MENSUELLE DIRECTEUR SDDR ──────────────
+    // ── PRODUCTION MENSUELLE DIRECTEUR SDDR ──────────────
+    @Transactional
+    public List<ProductionMensuelReponse> getProductionMensuelleDepartement(Long userId) {
+
+        Map<String, Object> sddrInfo = userServiceClient.getSDDRInfo(userId.intValue());
+        Integer idServiceDep = (Integer) sddrInfo.get("idServiceDepartementale");
+        var dep = geoServiceClient.getDepartementByServiceId(idServiceDep);
+        Long idDepartement = dep.getIdDepartement().longValue();
+
+        LocalDate aujourd_hui = LocalDate.now();
+        int anneeEnCours = aujourd_hui.getYear();
+        LocalDate debut = LocalDate.of(anneeEnCours - 1, 10, 1);
+        LocalDate fin = LocalDate.of(anneeEnCours, 8, 31);
+
+        List<Long> idParcelles = parcelleRepository
+                .findByIdDepartement(idDepartement)
+                .stream()
+                .map(p -> p.getIdParcel())
+                .toList();
+
+        if (idParcelles.isEmpty()) return genererMoisVides(debut, fin);
+
+        List<Culture> cultures = cultureRepository.findByParcelle_IdParcelIn(idParcelles);
+
+        List<Recolte> recoltes = recolteRepository.findAll()
+                .stream()
+                .filter(r -> idParcelles.contains(r.getCulture().getParcelle().getIdParcel()))
+                .filter(r -> !r.getDateRecolte().isBefore(debut) && !r.getDateRecolte().isAfter(fin))
+                .toList();
+
+        List<ProductionMensuelReponse> result = new java.util.ArrayList<>();
+        LocalDate moisCourant = debut.withDayOfMonth(1);
+
+        while (!moisCourant.isAfter(fin)) {
+            final LocalDate moisDebut = moisCourant;
+            final LocalDate moisFin = moisCourant.plusMonths(1).minusDays(1);
+
+            long nombreCultures = cultures.stream()
+                    .filter(c -> c.getDateSemence() != null && !c.getDateSemence().isAfter(moisFin))
+                    .filter(c -> c.getDatePremierRecoltePrevu() == null
+                            || !c.getDatePremierRecoltePrevu().isBefore(moisDebut))
+                    .count();
+
+            double surfaceMois = cultures.stream()
+                    .filter(c -> c.getDateSemence() != null
+                            && c.getSuperficiCultive() != null
+                            && !c.getDateSemence().isBefore(moisDebut)
+                            && !c.getDateSemence().isAfter(moisFin))
+                    .mapToDouble(Culture::getSuperficiCultive)
+                    .sum();
+
+            List<Recolte> recoltesMois = recoltes.stream()
+                    .filter(r -> !r.getDateRecolte().isBefore(moisDebut)
+                            && !r.getDateRecolte().isAfter(moisFin))
+                    .toList();
+
+            double productionMois = recoltesMois.stream()
+                    .mapToDouble(Recolte::getQuantiteRecolte)
+                    .sum();
+
+            String nomMois = moisCourant.getMonth()
+                    .getDisplayName(java.time.format.TextStyle.SHORT, java.util.Locale.FRENCH)
+                    + " " + moisCourant.getYear();
+
+            result.add(ProductionMensuelReponse.builder()
+                    .mois(nomMois)
+                    .moisNum(moisCourant.getMonthValue())
+                    .annee(moisCourant.getYear())
+                    .surfaceCultivee(surfaceMois)
+                    .productionKg(productionMois)
+                    .nombreCultures((int) nombreCultures)
+                    .nombreRecoltes(recoltesMois.size())
+                    .build());
+
+            moisCourant = moisCourant.plusMonths(1);
+        }
+        return result;
+    }
+
+    // ── MOIS VIDES ────────────────────────────────────────
+    private List<ProductionMensuelReponse> genererMoisVides(LocalDate debut, LocalDate fin) {
+        List<ProductionMensuelReponse> result = new java.util.ArrayList<>();
+        LocalDate mois = debut.withDayOfMonth(1);
+        while (!mois.isAfter(fin)) {
+            String nomMois = mois.getMonth()
+                    .getDisplayName(java.time.format.TextStyle.SHORT, java.util.Locale.FRENCH)
+                    + " " + mois.getYear();
+            result.add(ProductionMensuelReponse.builder()
+                    .mois(nomMois).moisNum(mois.getMonthValue())
+                    .annee(mois.getYear()).surfaceCultivee(0.0)
+                    .productionKg(0.0).nombreCultures(0).nombreRecoltes(0)
+                    .build());
+            mois = mois.plusMonths(1);
+        }
+        return result;
     }
 }

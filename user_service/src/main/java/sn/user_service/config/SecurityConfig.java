@@ -55,6 +55,28 @@ public class SecurityConfig {
                                 "/api/users/cooperatives/**"
                         ).permitAll()
 
+                        // ── MON PROFIL — AGRICULTEUR ──────────────────
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/users/agriculteurs/mon-profil"
+                        ).hasRole("AGRICULTEUR")
+
+                        // ── MON PROFIL — CHEF COOPERATIF ──────────────
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/users/chefs-cooperatifs/mon-profil",
+                                "/api/users/agriculteurs/mes-agriculteurs"
+                        ).hasRole("CHEF_COOPERATIF")
+
+                        // ── MON PROFIL — DIRECTEUR DR ─────────────────
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/users/directeurs/drdr/mon-profil",
+                                "/api/users/directeurs/dr/mon-profil"
+                        ).hasRole("DIRECTEUR_DR")
+
+                        // ── MON PROFIL — DIRECTEUR SDDR ───────────────
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/users/directeurs/sddr/mon-profil"
+                        ).hasRole("DIRECTEUR_SDDR")
+
                         // ── ADMIN — GET ───────────────────────────────
                         .requestMatchers(HttpMethod.GET,
                                 "/api/users/administrateurs",
@@ -75,7 +97,8 @@ public class SecurityConfig {
                                 "/api/users/administrateurs",
                                 "/api/users/decideurs",
                                 "/api/users/directeurs/**",
-                                "/api/users/chefs-cooperatifs"
+                                "/api/users/chefs-cooperatifs",
+                                "/api/users/cooperatives"
                         ).hasRole("ADMINISTRATEUR")
 
                         // ── ADMIN + CHEF COOP — POST agriculteur ──────
@@ -119,27 +142,6 @@ public class SecurityConfig {
                                 "/api/users/chefs-cooperatifs/**",
                                 "/api/users/agriculteurs/**"
                         ).hasRole("ADMINISTRATEUR")
-
-                        // ── AGRICULTEUR ───────────────────────────────
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/users/agriculteurs/mon-profil"
-                        ).hasRole("AGRICULTEUR")
-
-                        // ── CHEF COOPERATIF ───────────────────────────
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/users/chefs-cooperatifs/mon-profil",
-                                "/api/users/agriculteurs/mes-agriculteurs"
-                        ).hasRole("CHEF_COOPERATIF")
-
-                        // ── DIRECTEUR DR ──────────────────────────────
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/users/directeurs/dr/mon-profil"
-                        ).hasRole("DIRECTEUR_DR")
-
-                        // ── DIRECTEUR SDDR ────────────────────────────
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/users/directeurs/sddr/mon-profil"
-                        ).hasRole("DIRECTEUR_SDDR")
 
                         // ── ADMIN endpoints ───────────────────────────
                         .requestMatchers("/api/users/admin/**")

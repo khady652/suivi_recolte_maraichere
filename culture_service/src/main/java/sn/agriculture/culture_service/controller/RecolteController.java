@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
     @RequestMapping("/api/culture/recoltes")
     @RequiredArgsConstructor
     @Slf4j
-    @CrossOrigin(origins = "*")
+
     public class RecolteController {
 
         private final RecolteService recolteService;

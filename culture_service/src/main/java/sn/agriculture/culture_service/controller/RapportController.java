@@ -16,7 +16,7 @@ import java.time.LocalDate;
     @RequestMapping("/api/culture/rapports")
     @RequiredArgsConstructor
     @Slf4j
-    @CrossOrigin(origins = "*")
+
     public class RapportController {
 
         private final RapportService rapportService;

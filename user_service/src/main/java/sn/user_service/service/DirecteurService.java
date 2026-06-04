@@ -226,7 +226,7 @@ public class DirecteurService {
             Integer id, DirecteurRequest request) {
 
         DirecteurSDDR directeur = directeurSDDRRepository
-                .findById(id)
+                .findByIdUtilisateur(id)
                 .orElseThrow(() ->
                         new UserException("Directeur SDDR introuvable"));
 

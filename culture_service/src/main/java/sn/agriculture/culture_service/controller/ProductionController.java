@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import sn.agriculture.culture_service.client.GeoServiceClient;
 import sn.agriculture.culture_service.client.UserServiceClient;
 import sn.agriculture.culture_service.dtos.response.HistoriqueCultureResponse;
+import sn.agriculture.culture_service.dtos.response.ProductionMensuelReponse;
 import sn.agriculture.culture_service.repository.CultureRepos;
 import sn.agriculture.culture_service.service.CultureService;
 import sn.agriculture.culture_service.service.ProductionService;
@@ -23,7 +24,7 @@ import java.util.Map;
     @RequestMapping("/api/culture/productions")
     @RequiredArgsConstructor
     @Slf4j
-    @CrossOrigin(origins = "*")
+
     public class ProductionController {
 
         private final ProductionService productionService;
@@ -196,6 +197,16 @@ import java.util.Map;
                     .surfaceAnneeCourante(idDeps, a);
             return ResponseEntity.ok(
                     surface != null ? surface : 0.0);
+        }
+        // ── PRODUCTION MENSUELLE DIRECTEUR SDDR ──────────────
+// GET /api/culture/productions/mon-departement/mensuel
+        @GetMapping("/mon-departement/mensuel")
+        public ResponseEntity<List<ProductionMensuelReponse>>
+        getProductionMensuelleDepartement(Authentication authentication) {
+            Integer userId = (Integer) authentication.getPrincipal();
+            return ResponseEntity.ok(
+                    productionService.getProductionMensuelleDepartement(
+                            userId.longValue()));
         }
     }
 

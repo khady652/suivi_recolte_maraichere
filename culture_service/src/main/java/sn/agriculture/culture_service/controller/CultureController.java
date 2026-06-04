@@ -18,7 +18,6 @@ import java.util.List;
     @RequestMapping("/api/culture/cultures")
     @RequiredArgsConstructor
     @Slf4j
-    @CrossOrigin(origins = "*")
     public class CultureController {
 
         private final CultureService cultureService;

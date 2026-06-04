@@ -93,7 +93,8 @@ public class SecurityConf {
                         ).hasRole("DIRECTEUR_SDDR")
                         .requestMatchers(HttpMethod.GET,
                                 "/api/culture/productions/mon-departement/surface-cultivee",
-                                "/api/culture/productions/mon-departement/historique"
+                                "/api/culture/productions/mon-departement/historique",
+                                "/api/culture/productions/mon-departement/mensuel"
                         ).hasRole("DIRECTEUR_SDDR")
 
                         .requestMatchers(HttpMethod.GET,
