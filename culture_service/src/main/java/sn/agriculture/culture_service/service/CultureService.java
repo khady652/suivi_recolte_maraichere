@@ -74,8 +74,8 @@ public class CultureService {
                 .superficiCultive(request.getSuperficiCultive())
                 .saison(request.getSaison())
                 .intraUtilise(request.getIntraUtilise())
-                .intraSuplementaire(request.getIntraSuplementaire())
-                .engrais(request.getEngrais())
+                .fumureOrganique(request.getFumureOrganique())
+
                 .quantiteRecoltePrevu(quantitePredite) // ← ML
                 .parcelle(parcelle)
                 .build();
@@ -187,8 +187,7 @@ public class CultureService {
             culture.setSuperficiCultive(request.getSuperficiCultive());
         if (request.getSaison() != null)
             culture.setSaison(request.getSaison());
-        if (request.getEngrais() != null)
-            culture.setEngrais(request.getEngrais());
+
 
         // ✅ Recalculer la prédiction ML si modification
         try {
@@ -234,8 +233,7 @@ public class CultureService {
                 .saison(c.getSaison())
                 .quantiteRecoltePrevu(c.getQuantiteRecoltePrevu())
                 .intraUtilise(c.getIntraUtilise())
-                .intraSuplementaire(c.getIntraSuplementaire())
-                .engrais(c.getEngrais())
+                .fumureOrganique(c.getFumureOrganique())
                 .idParcel(c.getParcelle().getIdParcel())
                 .nomParcelle(c.getParcelle().getNomParcelle())
                 .lieu(c.getParcelle().getLieu())

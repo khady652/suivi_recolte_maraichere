@@ -24,8 +24,8 @@ public class CultureRequest {
     private Double superficiCultive;
     private String saison;
     private String intraUtilise;
-    private Boolean intraSuplementaire;
-    private Boolean engrais;
+    private Boolean fumureOrganique;
+
 
     @NotNull(message = "La parcelle est obligatoire")
     private Long idParcel;

@@ -10,6 +10,6 @@ import lombok.*;
 
         private Integer annee;
         private Double surfaceCultivee;
-
+        private String nomTerritoire;
     }
 

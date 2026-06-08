@@ -474,6 +474,7 @@ public class ProductionService {
         return HistoriqueCultureResponse.builder()
                 .annee(annee)
                 .surfaceCultivee(surface != null ? surface : 0.0)
+                .nomTerritoire(nomTerritoire)
 
                 .build();
     }

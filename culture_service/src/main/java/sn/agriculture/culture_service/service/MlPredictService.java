@@ -35,8 +35,9 @@ public class MlPredictService {
             body.put("irrigation",        mapperIrrigation(
                     request.getTypeIrrigation()));
             body.put("qualite_sol",       parcelle.getQualiteSol());
-            body.put("engrais",           Boolean.TRUE.equals(
-                    request.getEngrais())
+            body.put("engrais", (request.getIntraUtilise() != null &&
+                    !request.getIntraUtilise().isEmpty()) ||
+                    Boolean.TRUE.equals(request.getFumureOrganique())
                     ? "oui" : "non");
             body.put("experience_annees", 3); // valeur par défaut
             body.put("superficie_m2",     request.getSuperficiCultive() != null

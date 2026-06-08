@@ -20,8 +20,7 @@ public class CultureResponse {
     private String saison;
     private Double quantiteRecoltePrevu;
     private String intraUtilise;
-    private Boolean intraSuplementaire;
-    private Boolean engrais;
+    private Boolean fumureOrganique;
     private Long idParcel;
     private String nomParcelle;
     private String lieu;

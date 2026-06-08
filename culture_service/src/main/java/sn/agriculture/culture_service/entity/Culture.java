@@ -34,7 +34,7 @@ public class Culture {
     private String saison;
     private Double quantiteRecoltePrevu;
     private String intraUtilise;
-    private Boolean intraSuplementaire;
+    private Boolean fumureOrganique;
     private Boolean engrais;
 
     @ManyToOne(fetch = FetchType.LAZY)
