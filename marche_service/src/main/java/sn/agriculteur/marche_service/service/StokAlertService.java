@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
         private final CollecteRepos collecteRepository;
         private final UserServiceClient userServiceClient;
-
+        //private final AlerteService alerteService;
         // ── CONSOMMATION MENSUELLE (tonnes/mois) ──────────────
         private static final Map<String, Double>
                 CONSOMMATION_MENSUELLE = Map.of(
@@ -120,18 +120,15 @@ import java.util.stream.Collectors;
         public void verifierStockMensuel() {
             log.info("Vérification stock mensuel...");
 
-            StockAlertResponse stock =
-                    calculerStockAlert("oignon");
+            StockAlertResponse stock = calculerStockAlert("oignon");
 
             if (!stock.getNiveau().equals("OK")) {
                 envoyerAlerteDecideurs(stock.getMessage());
-                log.info("Alerte stock envoyée : {}",
-                        stock.getNiveau());
+                log.info("Alerte SMS envoyée : {}", stock.getNiveau());
             }
 
             log.info("Vérification terminée !");
         }
-
         // ── ENVOYER SMS AUX DÉCIDEURS ─────────────────────────
         private void envoyerAlerteDecideurs(String message) {
             try {

@@ -15,7 +15,7 @@ import java.util.Map;
     @RequestMapping("/api/public")
     @RequiredArgsConstructor
     @Slf4j
-    @CrossOrigin(origins = "*")
+    //@CrossOrigin(origins = "*")
     public class PublicController {
 
         private final PublicService publicService;

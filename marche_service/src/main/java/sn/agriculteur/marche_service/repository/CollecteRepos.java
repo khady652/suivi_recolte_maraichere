@@ -60,5 +60,16 @@ import java.util.List;
                 @Param("produit") String produit,
                 @Param("annee") int annee,
                 @Param("mois") Integer mois);
+        @Query("SELECT MONTH(c.dateCollecte), " +
+                "AVG(c.prixUnitaire), " +
+                "SUM(c.quantiteDisponible) " +
+                "FROM CollecteDonnees c " +
+                "WHERE LOWER(c.produit) = LOWER(:produit) " +
+                "AND YEAR(c.dateCollecte) = :annee " +
+                "GROUP BY MONTH(c.dateCollecte) " +
+                "ORDER BY MONTH(c.dateCollecte) ASC")
+        List<Object[]> statsMenuellesParProduit(
+                @Param("produit") String produit,
+                @Param("annee") int annee);
     }
 

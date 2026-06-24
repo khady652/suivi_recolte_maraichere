@@ -49,8 +49,22 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
                                     "/api/marche/collectes/stats/stock-du-jour",
                                     "/api/marche/collectes/produit/**",
                                     "/api/marche/collectes/stats/**"
-                            ).permitAll()
 
+                            ).permitAll()
+                            // ── ALERTES → DÉCIDEUR ARM ────────────────────────────
+                            .requestMatchers(HttpMethod.GET,
+                                    "/api/marche/alertes",
+                                    "/api/marche/alertes/count",
+                                    "/api/marche/alertes/historique"
+                            ).hasRole("DECIDEUR_ARM")
+
+                            .requestMatchers(HttpMethod.PUT,
+                                    "/api/marche/alertes/**"
+                            ).hasRole("DECIDEUR_ARM")
+
+                            .requestMatchers(HttpMethod.POST,
+                                    "/api/marche/alertes/generer"
+                            ).hasRole("DECIDEUR_ARM")
                             // ── ENQUÊTEUR → enregistrer / éditer collectes ─
                             .requestMatchers(HttpMethod.POST,
                                     "/api/marche/collectes"

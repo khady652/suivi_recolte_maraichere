@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sn.agriculteur.marche_service.Client.UserServiceClient;
 import sn.agriculteur.marche_service.dto.request.CollecteRequest;
 import sn.agriculteur.marche_service.dto.response.CollecteResponse;
+import sn.agriculteur.marche_service.dto.response.StatsMentruelReponse;
 import sn.agriculteur.marche_service.dto.response.VariationResponse;
 import sn.agriculteur.marche_service.entity.CollecteDonnees;
 import sn.agriculteur.marche_service.entity.Marche;
@@ -285,5 +286,32 @@ import java.util.stream.Collectors;
                     .variationPrix(variationPrix)
                     .variationStock(variationStock)
                     .build();
+        }
+        public List<StatsMentruelReponse> getStatsMensuelles(
+                String produit, Integer annee) {
+
+            int anneeRecherche = annee != null
+                    ? annee
+                    : LocalDate.now().getYear();
+
+            List<Object[]> resultats = collecteRepository
+                    .statsMenuellesParProduit(produit, anneeRecherche);
+
+            String[] nomsMois = {"", "Janv", "Févr", "Mars", "Avr",
+                    "Mai", "Juin", "Juil", "Août",
+                    "Sept", "Oct", "Nov", "Déc"};
+
+            return resultats.stream()
+                    .map(row -> StatsMentruelReponse.builder()
+                            .moisNum(((Number) row[0]).intValue())
+                            .moisNom(nomsMois[((Number) row[0]).intValue()])
+                            .prixMoyen(row[1] != null
+                                    ? Math.round(((Number) row[1]).doubleValue() * 10.0) / 10.0
+                                    : 0.0)
+                            .stockTotal(row[2] != null
+                                    ? Math.round(((Number) row[2]).doubleValue() / 1000.0 * 10.0) / 10.0
+                                    : 0.0)
+                            .build())
+                    .collect(Collectors.toList());
         }
     }

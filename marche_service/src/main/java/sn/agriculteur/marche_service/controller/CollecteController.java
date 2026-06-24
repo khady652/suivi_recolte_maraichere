@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import sn.agriculteur.marche_service.dto.request.CollecteRequest;
 import sn.agriculteur.marche_service.dto.response.CollecteResponse;
+import sn.agriculteur.marche_service.dto.response.StatsMentruelReponse;
 import sn.agriculteur.marche_service.dto.response.VariationResponse;
 import sn.agriculteur.marche_service.service.CollecteService;
 
@@ -19,7 +20,7 @@ import java.util.Map;
     @RequestMapping("/api/marche/collectes")
     @RequiredArgsConstructor
     @Slf4j
-    @CrossOrigin(origins = "*")
+    //@CrossOrigin(origins = "*")
     public class CollecteController {
 
         private final CollecteService collecteService;
@@ -115,6 +116,13 @@ import java.util.Map;
             return ResponseEntity.ok(
                     collecteService.getVariation(
                             produit, mois, annee));
+        }
+        @GetMapping("/stats/mensuelles")
+        public ResponseEntity<List<StatsMentruelReponse>> getStatsMensuelles(
+                @RequestParam String produit,
+                @RequestParam(required = false) Integer annee) {
+            return ResponseEntity.ok(
+                    collecteService.getStatsMensuelles(produit, annee));
         }
     }
 

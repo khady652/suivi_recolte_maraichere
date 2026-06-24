@@ -276,6 +276,18 @@ public class DirecteurService {
         response.setTelephone(d.getTelephone());
         response.setSpecialite(d.getSpecialite());
         response.setActif(d.getActif());
+
+        // ✅ Récupérer le nom du service régional
+        if (d.getIdServiceRegional() != null) {
+            try {
+                String nomService = geoServiceClient
+                        .getNomServiceRegional(d.getIdServiceRegional());
+                response.setNomService(nomService);
+            } catch (Exception e) {
+                log.warn("Service régional introuvable : {}",
+                        d.getIdServiceRegional());
+            }
+        }
         return response;
     }
 

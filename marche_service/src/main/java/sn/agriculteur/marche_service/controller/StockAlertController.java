@@ -11,7 +11,7 @@ import sn.agriculteur.marche_service.service.StokAlertService;
     @RequestMapping("/api/marche/stock-alert")
     @RequiredArgsConstructor
     @Slf4j
-    @CrossOrigin(origins = "*")
+    //@CrossOrigin(origins = "*")
     public class StockAlertController {
 
         private final StokAlertService stockAlertService;

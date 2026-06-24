@@ -156,7 +156,7 @@ import java.util.stream.Collectors;
         }
         public ChefCooperatifResponse getMonProfil(Integer userId) {
             ChefCooperatif chef = chefCooperatifRepository
-                    .findById(userId)
+                    .findByIdUtilisateur(userId)
                     .orElseThrow(() ->
                             new UserException("Profil introuvable"));
             return toResponse(chef);

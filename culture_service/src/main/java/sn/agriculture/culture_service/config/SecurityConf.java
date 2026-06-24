@@ -36,7 +36,9 @@ public class SecurityConf {
                                 "/webjars/**",
                                 "/api/culture/productions/par-region",
                                 "/api/culture/productions/par-annee",
-                                "/api/culture/productions/region/*/surface-cultivee"
+                                "/api/culture/productions/region/*/surface-cultivee",
+                                "/api/culture/recoltes/stats/par-region",
+                                "/api/culture/previsions/oignon"
                         ).permitAll()
 
                         // Actuator + Error
@@ -59,7 +61,9 @@ public class SecurityConf {
                         .requestMatchers(HttpMethod.GET,
                                 "/api/culture/parcelles/ma-region"
                         ).hasRole("DIRECTEUR_DR")
-
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/culture/previsions/ma-cooperative/**"
+                        ).hasRole("CHEF_COOPERATIF")
                         .requestMatchers(HttpMethod.GET,
                                 "/api/culture/parcelles/toutes"
                         ).hasAnyRole("ADMINISTRATEUR")

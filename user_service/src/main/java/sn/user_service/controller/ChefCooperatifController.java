@@ -38,7 +38,13 @@ import java.util.List;
         public ResponseEntity<List<ChefCooperatifResponse>> getAll() {
             return ResponseEntity.ok(chefCooperatifService.getAll());
         }
-
+        @GetMapping("/mon-profil")
+        public ResponseEntity<ChefCooperatifResponse> getMonProfil(
+                Authentication authentication) {
+            Integer userId = (Integer) authentication.getPrincipal();
+            return ResponseEntity.ok(
+                    chefCooperatifService.getMonProfil(userId));
+        }
         // GET /api/users/chefs-cooperatifs/{id}
         @GetMapping("/{id}")
         public ResponseEntity<ChefCooperatifResponse> getById(

@@ -96,7 +96,9 @@ public class DecideurService {
             decideur.setAdresse(request.getAdresse());
         if (request.getTelephone() != null)
             decideur.setTelephone(request.getTelephone());
-            decideur.setEmail(decideur.getEmail());
+        if (request.getEmail() != null)
+            decideur.setEmail(request.getEmail());
+        decideur.setEmail(request.getEmail());
         decideurARMRepository.save(decideur);
         return new MessageResponse(
                 "Décideur ARM modifié avec succès", true);

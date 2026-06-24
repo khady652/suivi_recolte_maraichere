@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -15,123 +16,141 @@ import reactor.core.publisher.Mono;
 import javax.crypto.SecretKey;
 import java.util.List;
 
-    @Component
-    @Slf4j
-    public class JwtAuthFilter  implements GlobalFilter, Ordered {
+@Component
+@Slf4j
+public class JwtAuthFilter implements GlobalFilter, Ordered {
 
-        @Value("${jwt.secret}")
-        private String jwtSecret;
+    @Value("${jwt.secret}")
+    private String jwtSecret;
 
-        private final List<String> publicRoutes = List.of(
-                "/api/auth/login",
-                "/api/auth/login/telephone",
-                "/api/auth/register",
-                "/api/auth/refresh",
-                "/api/auth/forgot-password",
-                "/api/auth/reset-password",
-                "/api/auth/health",
-                //"/api/users/agriculteurs",
-                //"/api/users/cooperatives",
-                "/api/culture/parcelles/departement",
-                "/api/culture/parcelles/region",
-                "/actuator/health",
-                "/api/auth/internal",
-                "/api/public",
+    // Routes totalement publiques (toutes méthodes)
+    private final List<String> publicRoutes = List.of(
+            "/api/auth/login",
+            "/api/auth/login/telephone",
+            "/api/auth/register",
+            "/api/auth/refresh",
+            "/api/auth/forgot-password",
+            "/api/auth/reset-password",
+            "/api/auth/health",
+            "/api/culture/parcelles/departement",
+            "/api/culture/parcelles/region",
+            "/actuator/health",
+            "/api/auth/internal",
+            "/api/public",
+            "/api/users/admin/stats/public",
+            "/api/marche/collectes/stats",
+            "/api/marche/collectes/derniers-prix",
+            // Swagger
+            "/swagger-ui.html",
+            "/swagger-ui",
+            "/v3/api-docs",
+            "/auth-service/v3/api-docs",
+            "/users-service/v3/api-docs",
+            "/geo_service/v3/api-docs",
+            "/culture_service/v3/api-docs",
+            "/webjars"
+    );
 
-                // Swagger
-                "/swagger-ui.html",
-                "/swagger-ui",
-                "/v3/api-docs",
-                "/auth-service/v3/api-docs",
-                "/users-service/v3/api-docs",
-                "/geo_service/v3/api-docs",
-                "/culture_service/v3/api-docs",
-                "/webjars"
-        );
+    // Routes publiques uniquement en GET
+    private final List<String> publicGetRoutes = List.of(
+            "/api/marche/marches",
+            "/api/users/cooperatives",
+            "/api/culture/recoltes/stats/par-region",
+            "/api/culture/previsions/oignon",
+            "/api/culture/productions/par-region",
+            "/api/culture/productions/par-annee",
+            "/api/culture/productions/region"
+    );
 
-        @Override
-        public Mono<Void> filter(
-                ServerWebExchange exchange,
-                GatewayFilterChain chain) {
+    @Override
+    public Mono<Void> filter(
+            ServerWebExchange exchange,
+            GatewayFilterChain chain) {
 
-            String path = exchange.getRequest()
-                    .getPath().toString();
+        String path = exchange.getRequest().getPath().toString();
+        String method = exchange.getRequest().getMethod().name();
 
-            if (isPublicRoute(path)) {
-                return chain.filter(exchange);
-            }
-
-            String authHeader = exchange.getRequest()
-                    .getHeaders()
-                    .getFirst("Authorization");
-
-            if (authHeader == null ||
-                    !authHeader.startsWith("Bearer ")) {
-                log.warn("Token manquant pour : {}", path);
-                exchange.getResponse()
-                        .setStatusCode(HttpStatus.UNAUTHORIZED);
-                return exchange.getResponse().setComplete();
-            }
-
-            String token = authHeader.substring(7);
-
-            try {
-                Claims claims = extractAllClaims(token);
-                Integer userId = claims.get("userId", Integer.class);
-                String role = claims.get("role", String.class);
-
-                log.debug("Utilisateur {} ({}) accède à {}",
-                        userId, role, path);
-
-                ServerWebExchange modifiedExchange = exchange
-                        .mutate()
-                        .request(r -> r
-                                .header("X-User-Id", userId.toString())
-                                .header("X-User-Role", role)
-                        )
-                        .build();
-
-                return chain.filter(modifiedExchange);
-
-            } catch (ExpiredJwtException e) {
-                log.warn("Token expiré : {}", path);
-                exchange.getResponse()
-                        .setStatusCode(HttpStatus.UNAUTHORIZED);
-                return exchange.getResponse().setComplete();
-
-            } catch (JwtException e) {
-                log.warn("Token invalide : {}", path);
-                exchange.getResponse()
-                        .setStatusCode(HttpStatus.UNAUTHORIZED);
-                return exchange.getResponse().setComplete();
-            }
+        // Vérifier routes publiques toutes méthodes
+        if (isPublicRoute(path)) {
+            return chain.filter(exchange);
         }
 
-        @Override
-        public int getOrder() {
-            return -1;
+        // Vérifier routes publiques GET uniquement
+        if (method.equals(HttpMethod.GET.name()) && isPublicGetRoute(path)) {
+            return chain.filter(exchange);
         }
 
-        private boolean isPublicRoute(String path) {
-            return publicRoutes.stream()
-                    .anyMatch(route -> path.equals(route) ||
-                            path.startsWith(route + "/"));
+        String authHeader = exchange.getRequest()
+                .getHeaders()
+                .getFirst("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            log.warn("Token manquant pour : {}", path);
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            return exchange.getResponse().setComplete();
         }
 
-        private Claims extractAllClaims(String token) {
-            return Jwts.parser()
-                    .verifyWith(getSigningKey())
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
-        }
+        String token = authHeader.substring(7);
 
-        private SecretKey getSigningKey() {
-            byte[] keyBytes = Decoders.BASE64.decode(
-                    java.util.Base64.getEncoder()
-                            .encodeToString(jwtSecret.getBytes())
-            );
-            return Keys.hmacShaKeyFor(keyBytes);
+        try {
+            Claims claims = extractAllClaims(token);
+            Integer userId = claims.get("userId", Integer.class);
+            String role = claims.get("role", String.class);
+
+            log.debug("Utilisateur {} ({}) accède à {}", userId, role, path);
+
+            ServerWebExchange modifiedExchange = exchange
+                    .mutate()
+                    .request(r -> r
+                            .header("X-User-Id", userId.toString())
+                            .header("X-User-Role", role)
+                    )
+                    .build();
+
+            return chain.filter(modifiedExchange);
+
+        } catch (ExpiredJwtException e) {
+            log.warn("Token expiré : {}", path);
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            return exchange.getResponse().setComplete();
+
+        } catch (JwtException e) {
+            log.warn("Token invalide : {}", path);
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            return exchange.getResponse().setComplete();
         }
     }
 
+    @Override
+    public int getOrder() {
+        return -1;
+    }
+
+    private boolean isPublicRoute(String path) {
+        return publicRoutes.stream()
+                .anyMatch(route -> path.equals(route) ||
+                        path.startsWith(route + "/"));
+    }
+
+    private boolean isPublicGetRoute(String path) {
+        return publicGetRoutes.stream()
+                .anyMatch(route -> path.equals(route) ||
+                        path.startsWith(route + "/"));
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(
+                java.util.Base64.getEncoder()
+                        .encodeToString(jwtSecret.getBytes())
+        );
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+}

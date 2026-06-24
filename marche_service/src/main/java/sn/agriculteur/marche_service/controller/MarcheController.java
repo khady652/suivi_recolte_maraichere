@@ -16,7 +16,7 @@ import java.util.List;
     @RequestMapping("/api/marche/marches")
     @RequiredArgsConstructor
     @Slf4j
-    @CrossOrigin(origins = "*")
+    //@CrossOrigin(origins = "*")
     public class MarcheController {
 
         private final MarcheService marcheService;

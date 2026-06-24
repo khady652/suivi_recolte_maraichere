@@ -6,6 +6,7 @@ package sn.agriculture.culture_service.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import sn.agriculture.culture_service.dtos.response.PrevisionResponse;
 import sn.agriculture.culture_service.service.AlertService;
@@ -45,5 +46,14 @@ import sn.agriculture.culture_service.service.PrevisionService;
 //                        "45000 tonnes sur Juin - Juillet 2026.");
 //        return ResponseEntity.ok("SMS envoyé !");
 //    }
+@GetMapping("/ma-cooperative/{produit}")
+public ResponseEntity<PrevisionResponse> calculerPrevisionCooperative(
+        @PathVariable String produit,
+        Authentication authentication) {
+    Long userId = ((Integer) authentication.getPrincipal()).longValue();
+    return ResponseEntity.ok(
+            previsionService.calculerPrevisionCooperative(userId));
+}
+
     }
 
