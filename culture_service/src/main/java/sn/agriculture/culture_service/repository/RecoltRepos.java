@@ -38,4 +38,17 @@ import java.util.List;
     List<Recolte> findByAnneeAndDepartements(
             @Param("annee") int annee,
             @Param("idDepartements") List<Long> idDepartements);
+
+    @Query("SELECT r FROM Recolte r WHERE " +
+            "r.dateRecolte BETWEEN :debut AND :fin AND " +
+            "r.culture.parcelle.idDepartement IN :idDepartements")
+    List<Recolte> findByCampagneAndDepartements(
+            @Param("debut") LocalDate debut,
+            @Param("fin") LocalDate fin,
+            @Param("idDepartements") List<Long> idDepartements);
+
+    @Query("SELECT r FROM Recolte r WHERE r.dateRecolte BETWEEN :debut AND :fin")
+    List<Recolte> findByCampagne(
+            @Param("debut") LocalDate debut,
+            @Param("fin") LocalDate fin);
 }

@@ -56,10 +56,11 @@ public class RapportService {
                         List.of(dep.getIdDepartement().longValue()),
                         annee);
 
-        // 4. Récoltes
+        // 4. Récoltes (filtrées par campagne : Oct année-1 → Août année)
+        LocalDate[] bornes = bornesCampagne(annee);
         List<Recolte> recoltes = recolteRepository
-                .findByAnneeAndDepartements(
-                        annee,
+                .findByCampagneAndDepartements(
+                        bornes[0], bornes[1],
                         List.of(dep.getIdDepartement().longValue()));
 
         // 5. Historique surface
@@ -76,7 +77,7 @@ public class RapportService {
                                 .build())
                         .collect(Collectors.toList());
 
-        // 6. Historique production
+        // 6. Historique production (regroupé par année de campagne)
         Map<String, Double> historiqueProduction = recolteRepository
                 .findAll()
                 .stream()
@@ -84,8 +85,7 @@ public class RapportService {
                         .getIdDepartement()
                         .equals(dep.getIdDepartement().longValue()))
                 .collect(Collectors.groupingBy(
-                        r -> String.valueOf(
-                                r.getDateRecolte().getYear()),
+                        r -> String.valueOf(anneeCampagneDe(r.getDateRecolte())),
                         Collectors.summingDouble(
                                 Recolte::getQuantiteRecolte)));
 
@@ -130,9 +130,11 @@ public class RapportService {
         Double surfaceCultivee = cultureRepository
                 .surfaceAnneeCourante(idDepartements, annee);
 
-        // 4. Récoltes
+        // 4. Récoltes (filtrées par campagne)
+        LocalDate[] bornes = bornesCampagne(annee);
         List<Recolte> recoltes = recolteRepository
-                .findByAnneeAndDepartements(annee, idDepartements);
+                .findByCampagneAndDepartements(
+                        bornes[0], bornes[1], idDepartements);
 
         // 5. Historique surface
         List<HistoriqueCultureResponse> historiqueSurface =
@@ -147,7 +149,7 @@ public class RapportService {
                                 .build())
                         .collect(Collectors.toList());
 
-        // 6. Historique production
+        // 6. Historique production (regroupé par année de campagne)
         Map<String, Double> historiqueProduction = recolteRepository
                 .findAll()
                 .stream()
@@ -155,8 +157,7 @@ public class RapportService {
                         r.getCulture().getParcelle()
                                 .getIdDepartement()))
                 .collect(Collectors.groupingBy(
-                        r -> String.valueOf(
-                                r.getDateRecolte().getYear()),
+                        r -> String.valueOf(anneeCampagneDe(r.getDateRecolte())),
                         Collectors.summingDouble(
                                 Recolte::getQuantiteRecolte)));
 
@@ -167,6 +168,61 @@ public class RapportService {
                 nomDirecteur,
                 prenomDirecteur,
                 regionInfo.getSuperficie(),
+                surfaceCultivee,
+                recoltes,
+                historiqueSurface,
+                historiqueProduction);
+    }
+
+    // ── RAPPORT NATIONAL DÉCIDEUR ARM ─────────────────────
+    public RapportAgricoleResponse getRapportNational(Integer annee) {
+
+        // 1. Tous les départements depuis geo-service
+        List<Long> tousLesDepartements = geoServiceClient
+                .getAllDepartements()
+                .stream()
+                .map(d -> d.getIdDepartement().longValue())
+                .toList();
+
+        // 2. Surface cultivée nationale
+        Double surfaceCultivee = cultureRepository
+                .surfaceAnneeCourante(
+                        tousLesDepartements, annee);
+
+        // 3. Toutes les récoltes de la campagne
+        LocalDate[] bornes = bornesCampagne(annee);
+        List<Recolte> recoltes = recolteRepository
+                .findByCampagne(bornes[0], bornes[1]);
+
+        // 4. Historique surface
+        List<HistoriqueCultureResponse> historiqueSurface =
+                cultureRepository
+                        .historiqueSurfaceParDepartements(
+                                tousLesDepartements)
+                        .stream()
+                        .map(row -> HistoriqueCultureResponse.builder()
+                                .annee(((Number) row[0]).intValue())
+                                .surfaceCultivee(
+                                        ((Number) row[1]).doubleValue())
+                                .build())
+                        .collect(Collectors.toList());
+
+        // 5. Historique production (regroupé par année de campagne)
+        Map<String, Double> historiqueProduction = recolteRepository
+                .findAll()
+                .stream()
+                .collect(Collectors.groupingBy(
+                        r -> String.valueOf(anneeCampagneDe(r.getDateRecolte())),
+                        Collectors.summingDouble(
+                                Recolte::getQuantiteRecolte)));
+
+        return buildRapport(
+                annee,
+                "Sénégal",
+                "NATIONAL",
+                "Décideur",
+                "ARM",
+                null,
                 surfaceCultivee,
                 recoltes,
                 historiqueSurface,
@@ -215,12 +271,10 @@ public class RapportService {
                         Collectors.summingDouble(
                                 Recolte::getQuantiteRecolte)));
 
-        // Production par saison
+        // Production par saison (casse normalisée pour éviter les doublons)
         Map<String, Double> productionParSaison = recoltes.stream()
                 .collect(Collectors.groupingBy(
-                        r -> r.getCulture().getSaison() != null
-                                ? r.getCulture().getSaison()
-                                : "Inconnue",
+                        r -> normaliserSaison(r.getCulture().getSaison()),
                         Collectors.summingDouble(
                                 Recolte::getQuantiteRecolte)));
 
@@ -271,111 +325,28 @@ public class RapportService {
                 .historiqueProduction(historiqueProduction)
                 .build();
     }
-    // ── RAPPORT NATIONAL DÉCIDEUR ARM ─────────────────────
-//    public RapportAgricoleResponse getRapportNational(Integer annee) {
-//
-//        // 1. Toutes les régions
-//        List<Long> tousLesDepartements = parcelleRepository
-//                .findAll()
-//                .stream()
-//                .map(p -> p.getIdDepartement())
-//                .distinct()
-//                .toList();
-//
-//        // 2. Surface cultivée nationale
-//        Double surfaceCultivee = cultureRepository
-//                .surfaceAnneeCourante(tousLesDepartements, annee);
-//
-//        // 3. Toutes les récoltes
-//        List<Recolte> recoltes = recolteRepository
-//                .findByAnnee(annee);
-//
-//        // 4. Historique surface
-//        List<HistoriqueCultureResponse> historiqueSurface =
-//                cultureRepository
-//                        .historiqueSurfaceParDepartements(
-//                                tousLesDepartements)
-//                        .stream()
-//                        .map(row -> HistoriqueCultureResponse.builder()
-//                                .annee(((Number) row[0]).intValue())
-//                                .surfaceCultivee(
-//                                        ((Number) row[1]).doubleValue())
-//                                .build())
-//                        .collect(Collectors.toList());
-//
-//        // 5. Historique production national
-//        Map<String, Double> historiqueProduction = recolteRepository
-//                .findAll()
-//                .stream()
-//                .collect(Collectors.groupingBy(
-//                        r -> String.valueOf(
-//                                r.getDateRecolte().getYear()),
-//                        Collectors.summingDouble(
-//                                Recolte::getQuantiteRecolte)));
-//
-//        return buildRapport(
-//                annee,
-//                "Sénégal",
-//                "NATIONAL",
-//                "Décideur",
-//                "ARM",
-//                null,  // pas de superficie nationale fixe
-//                surfaceCultivee,
-//                recoltes,
-//                historiqueSurface,
-//                historiqueProduction);
-//    }
-    public RapportAgricoleResponse getRapportNational(Integer annee) {
 
-        // 1. Tous les départements depuis geo-service
-        List<Long> tousLesDepartements = geoServiceClient
-                .getAllDepartements()
-                .stream()
-                .map(d -> d.getIdDepartement().longValue())
-                .toList();
+    // ── UTILITAIRES CAMPAGNE ───────────────────────────────
 
-        // 2. Surface cultivée nationale
-        Double surfaceCultivee = cultureRepository
-                .surfaceAnneeCourante(
-                        tousLesDepartements, annee);
+    // Bornes de la campagne (Oct année-1 → Août année)
+    private LocalDate[] bornesCampagne(int anneeCampagne) {
+        return new LocalDate[] {
+                LocalDate.of(anneeCampagne - 1, 10, 1),
+                LocalDate.of(anneeCampagne, 8, 31)
+        };
+    }
 
-        // 3. Toutes les récoltes de l'année
-        List<Recolte> recoltes = recolteRepository
-                .findByAnnee(annee);
+    // Convertit une date en "année de campagne" (Oct, Nov, Déc → campagne année+1)
+    private int anneeCampagneDe(LocalDate date) {
+        return date.getMonthValue() >= 10
+                ? date.getYear() + 1
+                : date.getYear();
+    }
 
-        // 4. Historique surface
-        List<HistoriqueCultureResponse> historiqueSurface =
-                cultureRepository
-                        .historiqueSurfaceParDepartements(
-                                tousLesDepartements)
-                        .stream()
-                        .map(row -> HistoriqueCultureResponse.builder()
-                                .annee(((Number) row[0]).intValue())
-                                .surfaceCultivee(
-                                        ((Number) row[1]).doubleValue())
-                                .build())
-                        .collect(Collectors.toList());
-
-        // 5. Historique production
-        Map<String, Double> historiqueProduction = recolteRepository
-                .findAll()
-                .stream()
-                .collect(Collectors.groupingBy(
-                        r -> String.valueOf(
-                                r.getDateRecolte().getYear()),
-                        Collectors.summingDouble(
-                                Recolte::getQuantiteRecolte)));
-
-        return buildRapport(
-                annee,
-                "Sénégal",
-                "NATIONAL",
-                "Décideur",
-                "ARM",
-                null,
-                surfaceCultivee,
-                recoltes,
-                historiqueSurface,
-                historiqueProduction);
+    // Normalise la casse d'une saison (ex: "hivernage" et "Hivernage" → "Hivernage")
+    private String normaliserSaison(String saison) {
+        if (saison == null || saison.isBlank()) return "Inconnue";
+        String s = saison.trim().toLowerCase();
+        return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 }

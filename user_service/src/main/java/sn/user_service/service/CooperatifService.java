@@ -95,15 +95,17 @@ import java.util.stream.Collectors;
                     "Coopérative supprimée avec succès", true);
         }
 
-        // ── MÉTHODE UTILITAIRE ────────────────────────────────
         private CooperativeReponse toResponse(Cooperative c) {
             CooperativeReponse response = new CooperativeReponse();
             response.setIdCooperation(c.getIdCooperation());
             response.setNomCooperative(c.getNomCooperative());
             response.setAdresse(c.getAdresse());
+            response.setCreationDate(c.getDateCreation());
             response.setNombreMembres(c.getNombreMembres());
             if (c.getChefCooperatif() != null) {
                 response.setNomChef(c.getChefCooperatif().getNom());
+                response.setPrenomChef(c.getChefCooperatif().getPrenom()); // ← ajoute
+                response.setTelephoneChef(c.getChefCooperatif().getTelephone()); // ← ajoute
             }
             return response;
         }

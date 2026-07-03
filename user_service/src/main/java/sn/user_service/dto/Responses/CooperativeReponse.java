@@ -3,7 +3,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-    @Data
+import java.time.LocalDate;
+import java.util.Date;
+
+@Data
     @NoArgsConstructor
     @AllArgsConstructor
     public class CooperativeReponse {
@@ -13,5 +16,8 @@ import lombok.NoArgsConstructor;
         private String adresse;
         private Integer nombreMembres;
         private String nomChef;
+        private String prenomChef;
+        private String telephoneChef;
+        private LocalDate creationDate;
     }
 

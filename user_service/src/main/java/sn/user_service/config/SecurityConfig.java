@@ -81,6 +81,9 @@ public class SecurityConfig {
                                 "/api/users/chefs-cooperatifs/agriculteurs"
                         ).hasRole("CHEF_COOPERATIF")
 
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/users/cooperatives"
+                        ).hasAnyRole("ADMINISTRATEUR", "CHEF_COOPERATIF")
                         // ── CHEF COOPERATIF — PUT ─────────────────────
                         .requestMatchers(HttpMethod.PUT,
                                 "/api/users/agriculteurs/**"
